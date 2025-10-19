@@ -1,13 +1,16 @@
 package com.ilyaproject;
 
+import com.ilyaproject.core.dto.Token;
 import com.ilyaproject.core.model.Database;
 import com.ilyaproject.core.model.type.JsqlType;
+import com.ilyaproject.core.parser.SQLTokenizer;
 import com.ilyaproject.core.utils.CliUtils;
 
+import java.util.List;
 import java.util.Map;
 public class Main {
     public static void main(String[] args) {
-        Database db = new Database();
+        Database db = Database.getInstance();
         db.createTable("users", Map.of("id", JsqlType.INTEGER, "name", JsqlType.TEXT, "surname", JsqlType.TEXT));
         db.insert("users", Map.of("id", 1, "name", "Alice"));
         db.insert("pidory", Map.of("id", 1, "name", "Alice"));
@@ -15,6 +18,9 @@ public class Main {
         db.insert("users", Map.of("id", 3, "name", "Vlados"));
         db.insert("users", Map.of("id", 4, "name", "Nigger"));
         CliUtils.printTable(db.select("users"));
-        CliUtils.printTable(db.select("pidory"));
+//        SQLTokenizer tokenizer = new SQLTokenizer();
+//        String sql = "SELECT country_id, country_name FROM countries WHERE region_id = 1 ORDER BY country_name;";
+//        List<Token> lst = tokenizer.tokenize(sql);
+//        System.out.println(lst);
     }
 }

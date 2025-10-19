@@ -9,7 +9,7 @@ import com.ilyaproject.core.model.type.TypesTable;
 import java.sql.SQLException;
 import java.util.*;
 
-public final class Table {
+final class Table {
 
     private final String name;
     private final Schema schema;
@@ -27,11 +27,11 @@ public final class Table {
     private class Schema {
         private final Map<String, JsqlType> columns;
 
-        public Schema(Map<String, JsqlType> columns) {
+        Schema(Map<String, JsqlType> columns) {
             this.columns = columns;
         }
 
-        public Set<String> getColumnsKeys() {
+        Set<String> getColumnsKeys() {
             return columns.keySet();
         }
 
@@ -44,14 +44,14 @@ public final class Table {
     private class Row {
         private Map<String, Object> elements;
 
-        public Row() {
+        Row() {
             elements = new HashMap<>();
             for (String key: schema.getColumnsKeys()) {
                 elements.put(key, null);
             }
         }
 
-        public void setElement(String key, Object element) throws SQLException, IllegalArgumentException{
+        void setElement(String key, Object element) throws SQLException, IllegalArgumentException{
             if (!elements.containsKey(key)) {
                 throw new SQLException(
                         String.format(
@@ -81,7 +81,7 @@ public final class Table {
         }
     }
 
-    public void createRow(Map<String, Object> rowData) throws SQLException, IllegalArgumentException {
+    void createRow(Map<String, Object> rowData) throws SQLException, IllegalArgumentException {
         Row row = new Row();
         for (String key: rowData.keySet()) {
             row.setElement(key, rowData.get(key));
@@ -89,7 +89,7 @@ public final class Table {
         rows.add(row);
     }
 
-    public TableDto getTableData() {
+    TableDto getTableData() {
         return new TableDto(
                 Map.copyOf(schema.columns),
                 List.copyOf(rows
