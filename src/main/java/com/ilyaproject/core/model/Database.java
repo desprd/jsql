@@ -1,7 +1,5 @@
 package com.ilyaproject.core.model;
 
-
-
 import com.ilyaproject.core.dto.TableDto;
 import com.ilyaproject.core.model.type.JsqlType;
 import com.ilyaproject.core.utils.DataUtils;
@@ -9,13 +7,28 @@ import com.ilyaproject.core.utils.DataUtils;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 public final class Database {
 
+    private static volatile Database instance;
     private final Map<String, Table> tables;
 
-    public Database() {
+    private Database() {
         tables = new HashMap<>();
+    }
+
+    public static Database getInstance() {
+        Database result = instance;
+        if (result != null) {
+            return result;
+        }
+        synchronized (Database.class) {
+            if (instance == null) {
+                instance = new Database();
+            }
+            return instance;
+        }
     }
 
     public void createTable(String name, Map<String, JsqlType> schema) {
