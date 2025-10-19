@@ -4,6 +4,7 @@ package com.ilyaproject.core.model;
 
 import com.ilyaproject.core.dto.TableDto;
 import com.ilyaproject.core.model.type.JsqlType;
+import com.ilyaproject.core.utils.DataUtils;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -29,11 +30,16 @@ public final class Database {
             } catch (SQLException | IllegalArgumentException e) {
                 System.err.println("FAILURE: " + e.getMessage());
             }
+        } else {
+            System.err.printf("FAILURE: table %s was not found in database%n", name);
         }
     }
 
     public TableDto select(String name) {
         Table table = tables.get(name);
-        return table.getTableData();
+        if (table != null){
+            return table.getTableData();
+        }
+        return DataUtils.getEmptyTableDto();
     }
 }
