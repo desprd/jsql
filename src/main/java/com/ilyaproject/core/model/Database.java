@@ -1,0 +1,39 @@
+package com.ilyaproject.core.model;
+
+
+
+import com.ilyaproject.core.dto.TableDto;
+import com.ilyaproject.core.model.type.JsqlType;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
+public final class Database {
+
+    private final Map<String, Table> tables;
+
+    public Database() {
+        tables = new HashMap<>();
+    }
+
+    public void createTable(String name, Map<String, JsqlType> schema) {
+        tables.put(name, new Table(name, schema));
+    }
+
+    public void insert(String name, Map<String, Object> rowData) {
+        Table table = tables.get(name);
+        if (table != null) {
+            try {
+                table.createRow(rowData);
+            } catch (SQLException | IllegalArgumentException e) {
+                System.err.println("FAILURE: " + e.getMessage());
+            }
+        }
+    }
+
+    public TableDto select(String name) {
+        Table table = tables.get(name);
+        return table.getTableData();
+    }
+}
