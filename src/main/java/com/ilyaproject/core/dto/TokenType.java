@@ -5,5 +5,6 @@ public enum TokenType {
     IDENTIFIER,
     TEXT,
     NUMBER,
-    SYMBOL
+    SYMBOL,
+    UNKNOWN
 }

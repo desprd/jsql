@@ -28,7 +28,7 @@ public final class SQLTokenizer {
                 tokens.add(
                         getKeywordOrIdentifierToken(current.toString())
                 );
-                current.delete(0, current.length());
+                current.setLength(0);
             }
             else if (
                     Character.isDigit(rowSqlCharacters[pointer])
@@ -46,46 +46,50 @@ public final class SQLTokenizer {
                                 current.toString()
                         )
                 );
-                current.delete(0, current.length());
+                current.setLength(0);
             }
             else if (
                     Constants.SPECIAL_CHARACTERS.contains(rowSqlCharacters[pointer])
             ) {
-                while (
-                        pointer < rowSqlCharacters.length &&
-                        Constants.SPECIAL_CHARACTERS.contains(rowSqlCharacters[pointer])
-                ) {
-                    current.append(rowSqlCharacters[pointer]);
-                    pointer++;
-                }
                 tokens.add(
                         new Token(
                                 TokenType.SYMBOL,
-                                current.toString()
+                                Character.toString(rowSqlCharacters[pointer])
                         )
                 );
-                current.delete(0, current.length());
+                pointer++;
             }
             else if (
                     rowSqlCharacters[pointer] == '\'' || rowSqlCharacters[pointer] == '"'
             ) {
+                char quote = rowSqlCharacters[pointer];
                 pointer++;
                 while (
                         pointer < rowSqlCharacters.length &&
-                        (rowSqlCharacters[pointer] != '\'' || rowSqlCharacters[pointer] != '"')
+                        rowSqlCharacters[pointer] != quote
                 ) {
                     current.append(rowSqlCharacters[pointer]);
                     pointer++;
                 }
+                pointer++;
                 tokens.add(
                         new Token(
                                 TokenType.TEXT,
                                 current.toString()
                         )
                 );
-                current.delete(0, current.length());
+                current.setLength(0);
+            }
+            else if (Character.isSpaceChar(rowSqlCharacters[pointer])){
+                pointer++;
             }
             else {
+                tokens.add(
+                        new Token(
+                                TokenType.UNKNOWN,
+                                Character.toString(rowSqlCharacters[pointer])
+                        )
+                );
                 pointer++;
             }
         }

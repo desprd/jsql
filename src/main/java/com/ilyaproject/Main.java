@@ -11,16 +11,16 @@ import java.util.Map;
 public class Main {
     public static void main(String[] args) {
         Database db = Database.getInstance();
-        db.createTable("users", Map.of("id", JsqlType.INTEGER, "name", JsqlType.TEXT, "surname", JsqlType.TEXT));
-        db.insert("users", Map.of("id", 1, "name", "Alice"));
-        db.insert("pidory", Map.of("id", 1, "name", "Alice"));
-        db.insert("users", Map.of("id", 2, "name", "Mark"));
-        db.insert("users", Map.of("id", 3, "name", "Vlados"));
-        db.insert("users", Map.of("id", 4, "name", "Nigger"));
-        CliUtils.printTable(db.select("users"));
-//        SQLTokenizer tokenizer = new SQLTokenizer();
-//        String sql = "SELECT country_id, country_name FROM countries WHERE region_id = 1 ORDER BY country_name;";
-//        List<Token> lst = tokenizer.tokenize(sql);
-//        System.out.println(lst);
+//        db.createTable("users", Map.of("id", JsqlType.INTEGER, "name", JsqlType.TEXT, "surname", JsqlType.TEXT));
+//        db.insert("users", Map.of("id", 1, "name", "Alice"));
+//        db.insert("pidory", Map.of("id", 1, "name", "Alice"));
+//        db.insert("users", Map.of("id", 2, "name", "Mark"));
+//        db.insert("users", Map.of("id", 3, "name", "Vlados"));
+//        db.insert("users", Map.of("id", 4, "name", "Nigger"));
+//        CliUtils.printTable(db.select("users"));
+        SQLTokenizer tokenizer = new SQLTokenizer();
+        String sql = "INSERT INTO users (id, name, age, active) VALUES (1, 'Alice', 30, true);";
+        List<Token> lst = tokenizer.tokenize(sql);
+        System.out.println(lst);
     }
 }

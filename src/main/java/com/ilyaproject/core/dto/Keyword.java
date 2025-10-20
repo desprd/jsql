@@ -9,5 +9,6 @@ public enum Keyword {
     TABLE,
     WHERE,
     ORDER,
-    BY
+    BY,
+    VALUES
 }
