@@ -1,4 +1,4 @@
-package com.ilyaproject.parser;
+package com.ilyaproject.core.parser;
 
 import com.ilyaproject.core.dto.Token;
 import com.ilyaproject.core.dto.TokenType;
@@ -38,6 +38,7 @@ class SQLTokenizerTest {
 
         // Then
         assertEquals(expected, tokens);
+
     }
 
     @Test
