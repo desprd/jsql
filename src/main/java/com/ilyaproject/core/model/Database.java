@@ -1,13 +1,12 @@
 package com.ilyaproject.core.model;
 
-import com.ilyaproject.core.dto.TableDto;
+import com.ilyaproject.core.dto.table.TableDto;
 import com.ilyaproject.core.model.type.JsqlType;
 import com.ilyaproject.core.utils.DataUtils;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 public final class Database {
 

@@ -1,4 +1,4 @@
-package com.ilyaproject.core.dto;
+package com.ilyaproject.core.dto.token;
 
 public enum Keyword {
     SELECT,
@@ -10,5 +10,7 @@ public enum Keyword {
     WHERE,
     ORDER,
     BY,
-    VALUES
+    VALUES,
+    AND,
+    OR
 }

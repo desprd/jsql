@@ -10,4 +10,8 @@ public final class Constants {
     public static final Set<Character> SPECIAL_CHARACTERS = Set.of(
             '(', ')', ',', ';', '=', '+', '-', '*', '/', '<', '>', '!', '%', '.'
     );
+
+    public static final Set<String> VALID_EXPRESSION_SYMBOLS = Set.of(
+            ">", "<", "/", "*", "-", "+", "="
+    );
 }

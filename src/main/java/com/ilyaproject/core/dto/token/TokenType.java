@@ -1,4 +1,4 @@
-package com.ilyaproject.core.dto;
+package com.ilyaproject.core.dto.token;
 
 public enum TokenType {
     KEYWORD,

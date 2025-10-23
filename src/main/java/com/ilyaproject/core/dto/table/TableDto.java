@@ -1,4 +1,4 @@
-package com.ilyaproject.core.dto;
+package com.ilyaproject.core.dto.table;
 
 
 import com.ilyaproject.core.model.type.JsqlType;

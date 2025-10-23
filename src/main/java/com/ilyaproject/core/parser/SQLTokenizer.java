@@ -1,15 +1,15 @@
 package com.ilyaproject.core.parser;
 
-import com.ilyaproject.core.dto.Keyword;
-import com.ilyaproject.core.dto.Token;
-import com.ilyaproject.core.dto.TokenType;
+import com.ilyaproject.core.dto.token.Keyword;
+import com.ilyaproject.core.dto.token.Token;
+import com.ilyaproject.core.dto.token.TokenType;
 import com.ilyaproject.core.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public final class SQLTokenizer {
-    public List<Token> tokenize(String rowSql) {
+final class SQLTokenizer {
+    List<Token> tokenize(String rowSql) {
         List<Token> tokens = new ArrayList<>();
         char[] rowSqlCharacters = rowSql.toCharArray();
         int pointer = 0;

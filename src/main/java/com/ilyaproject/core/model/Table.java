@@ -2,7 +2,7 @@ package com.ilyaproject.core.model;
 
 
 
-import com.ilyaproject.core.dto.TableDto;
+import com.ilyaproject.core.dto.table.TableDto;
 import com.ilyaproject.core.model.type.JsqlType;
 import com.ilyaproject.core.model.type.TypesTable;
 

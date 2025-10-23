@@ -1,13 +1,7 @@
 package com.ilyaproject;
 
-import com.ilyaproject.core.dto.Token;
 import com.ilyaproject.core.model.Database;
-import com.ilyaproject.core.model.type.JsqlType;
-import com.ilyaproject.core.parser.SQLTokenizer;
-import com.ilyaproject.core.utils.CliUtils;
 
-import java.util.List;
-import java.util.Map;
 public class Main {
     public static void main(String[] args) {
         Database db = Database.getInstance();
@@ -18,9 +12,5 @@ public class Main {
 //        db.insert("users", Map.of("id", 3, "name", "Vlados"));
 //        db.insert("users", Map.of("id", 4, "name", "Nigger"));
 //        CliUtils.printTable(db.select("users"));
-        SQLTokenizer tokenizer = new SQLTokenizer();
-        String sql = "INSERT INTO users (id, name, age, active) VALUES (1, 'Alice', 30, true);";
-        List<Token> lst = tokenizer.tokenize(sql);
-        System.out.println(lst);
     }
 }
