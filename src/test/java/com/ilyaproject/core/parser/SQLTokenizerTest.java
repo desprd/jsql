@@ -1,8 +1,7 @@
 package com.ilyaproject.core.parser;
 
-import com.ilyaproject.core.dto.Token;
-import com.ilyaproject.core.dto.TokenType;
-import com.ilyaproject.core.parser.SQLTokenizer;
+import com.ilyaproject.core.dto.token.Token;
+import com.ilyaproject.core.dto.token.TokenType;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
