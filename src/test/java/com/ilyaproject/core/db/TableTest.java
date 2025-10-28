@@ -1,6 +1,6 @@
-package com.ilyaproject.core.model;
+package com.ilyaproject.core.db;
 
-import com.ilyaproject.core.model.type.JsqlType;
+import com.ilyaproject.core.db.type.JsqlType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

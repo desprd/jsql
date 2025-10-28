@@ -1,7 +1,7 @@
-package com.ilyaproject.core.model;
+package com.ilyaproject.core.db;
 
 import com.ilyaproject.core.dto.table.TableDto;
-import com.ilyaproject.core.model.type.JsqlType;
+import com.ilyaproject.core.db.type.JsqlType;
 import com.ilyaproject.core.utils.DataUtils;
 
 import java.sql.SQLException;
@@ -28,6 +28,10 @@ public final class Database {
             }
             return instance;
         }
+    }
+
+    Map<String, Table> getTables() {
+        return tables;
     }
 
     public void createTable(String name, Map<String, JsqlType> schema) {

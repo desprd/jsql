@@ -1,4 +1,4 @@
-package com.ilyaproject.core.model.type;
+package com.ilyaproject.core.db.type;
 
 public enum JsqlType {
     TEXT,

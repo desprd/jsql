@@ -1,7 +1,7 @@
 package com.ilyaproject.core.dto.table;
 
 
-import com.ilyaproject.core.model.type.JsqlType;
+import com.ilyaproject.core.db.type.JsqlType;
 
 import java.util.List;
 import java.util.Map;

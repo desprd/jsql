@@ -1,6 +1,6 @@
 package com.ilyaproject;
 
-import com.ilyaproject.core.model.Database;
+import com.ilyaproject.core.db.Database;
 
 public class Main {
     public static void main(String[] args) {

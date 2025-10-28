@@ -1,7 +1,7 @@
 package com.ilyaproject.core.utils;
 
 import com.ilyaproject.core.dto.table.TableDto;
-import com.ilyaproject.core.model.type.JsqlType;
+import com.ilyaproject.core.db.type.JsqlType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
