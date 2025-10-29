@@ -17,21 +17,21 @@ import java.util.List;
 import java.util.Map;
 
 class SelectExecutorTest {
-    private SelectQuery query;
-
-    @BeforeEach
-    void setUp() {
-        Expression expression = new SimpleExpression(
-                List.of(
-                        new ExpressionUnit("area", ExpressionUnitType.TEXT),
-                        new ExpressionUnit(">", ExpressionUnitType.SYMBOL),
-                        new ExpressionUnit("10000", ExpressionUnitType.NUMERIC)
-                )
-        );
-        query = new SelectQueryBuilder()
-                .addTable("countries")
-                .addColumn("name")
-                .addConditions(expression)
-                .build();
-    }
+//    private SelectQuery query;
+//
+//    @BeforeEach
+//    void setUp() {
+//        Expression expression = new SimpleExpression(
+//                List.of(
+//                        new ExpressionUnit("area", ExpressionUnitType.TEXT),
+//                        new ExpressionUnit(">", ExpressionUnitType.SYMBOL),
+//                        new ExpressionUnit("10000", ExpressionUnitType.NUMERIC)
+//                )
+//        );
+//        query = new SelectQueryBuilder()
+//                .addTable("countries")
+//                .addColumn("name")
+//                .addConditions(expression)
+//                .build();
+//    }
 }
