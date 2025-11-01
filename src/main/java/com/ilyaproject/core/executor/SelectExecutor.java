@@ -1,6 +1,7 @@
 package com.ilyaproject.core.executor;
 
 import com.ilyaproject.core.db.TableUtils;
+import com.ilyaproject.core.db.type.JsqlType;
 import com.ilyaproject.core.dto.executor.SQLResponse;
 import com.ilyaproject.core.dto.expression.*;
 import com.ilyaproject.core.dto.query.SelectQuery;
@@ -8,11 +9,9 @@ import com.ilyaproject.core.db.Database;
 import com.ilyaproject.core.dto.table.TableDto;
 import com.ilyaproject.core.utils.DataUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 class SelectExecutor implements StatementExecutor<SelectQuery>{
     @Override
@@ -20,7 +19,7 @@ class SelectExecutor implements StatementExecutor<SelectQuery>{
         List<TableDto> tables = TableUtils.getTablesByTablesNames(query.tables(), db);
         extractRequiredColumns(tables, query.columns());
         tables = applyConditions(tables, query.conditions());
-        return null;
+        return new SQLResponse(true, "SELECTED", Optional.of(tables));
     }
 
     private void extractRequiredColumns(List<TableDto> tables, List<String> columns) {
@@ -53,7 +52,7 @@ class SelectExecutor implements StatementExecutor<SelectQuery>{
     }
 
     @SuppressWarnings("unchecked")
-    public TableDto filterTable(TableDto table, SimpleExpression condition) {
+    private TableDto filterTable(TableDto table, SimpleExpression condition) {
         List<ExpressionUnit> expressionUnits = condition.expression();
         if (!isSimpleExpressionValid(expressionUnits)) {
             throw new IllegalArgumentException("Wrong expression format in WHERE block");
@@ -73,6 +72,18 @@ class SelectExecutor implements StatementExecutor<SelectQuery>{
                        return intersectRows(table, same);
                 })
                 .collect(Collectors.toList());
+            }
+            case "OR" -> {
+                Map<Map<String, JsqlType>, TableDto> merged = new LinkedHashMap<>();
+
+                Stream.concat(left.stream(), right.stream())
+                        .forEach(table -> merged.merge(
+                                table.schema(),
+                                table,
+                                this::mergeRows
+                        ));
+
+                return new ArrayList<>(merged.values());
             }
         }
         return left;
@@ -160,6 +171,16 @@ class SelectExecutor implements StatementExecutor<SelectQuery>{
             }
         }
         return new TableDto(firstTable.schema(), intersection);
+    }
+
+    private TableDto mergeRows(TableDto first, TableDto second) {
+        List<Map<String, Object>> mergedRows = new ArrayList<>(first.rows());
+        for (Map<String, Object> row : second.rows()) {
+            if (!mergedRows.contains(row)) {
+                mergedRows.add(new HashMap<>(row));
+            }
+        }
+        return new TableDto(first.schema(), mergedRows);
     }
 
 }
