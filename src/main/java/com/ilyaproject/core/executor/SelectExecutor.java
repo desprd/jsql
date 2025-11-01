@@ -17,8 +17,8 @@ class SelectExecutor implements StatementExecutor<SelectQuery>{
     @Override
     public SQLResponse get(SelectQuery query, Database db) {
         List<TableDto> tables = TableUtils.getTablesByTablesNames(query.tables(), db);
-        extractRequiredColumns(tables, query.columns());
         tables = applyConditions(tables, query.conditions());
+        extractRequiredColumns(tables, query.columns());
         return new SQLResponse(true, "SELECTED", Optional.of(tables));
     }
 
@@ -129,9 +129,13 @@ class SelectExecutor implements StatementExecutor<SelectQuery>{
                 try {
                     double realValue = Double.parseDouble(comparisonValue);
                     return ((Number) fieldValue).doubleValue() < realValue;
-                } catch (NumberFormatException e) {
+                } catch (ClassCastException e) {
                     throw new IllegalArgumentException(
                             "Field " + fieldName + " with value " + fieldValue + " cannot be compared with <"
+                    );
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException(
+                            "Comparison value " + comparisonValue + " cannot be compared with <"
                     );
                 }
             }
@@ -140,9 +144,13 @@ class SelectExecutor implements StatementExecutor<SelectQuery>{
                     try {
                         double realValue = Double.parseDouble(comparisonValue);
                         return ((Number) fieldValue).doubleValue() == realValue;
+                    } catch (ClassCastException e) {
+                        throw new IllegalArgumentException(
+                                "Field " + fieldName + " with value " + fieldValue + " cannot be compared with ="
+                        );
                     } catch (NumberFormatException e) {
                         throw new IllegalArgumentException(
-                                "Field " + fieldName + " with value " + fieldValue + " cannot be compared with >"
+                                "Comparison value " + comparisonValue + " cannot be compared with ="
                         );
                     }
                 } else if (expressionUnits.get(2).type() == ExpressionUnitType.TEXT) {

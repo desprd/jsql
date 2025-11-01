@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 public class TableUtils {
+
+    private TableUtils(){};
+
     public static List<TableDto> getTablesByTablesNames(List<String> names, Database db) {
         if (names.isEmpty()) {
             throw new IllegalArgumentException("SELECT statement supposed to include at least one table");
