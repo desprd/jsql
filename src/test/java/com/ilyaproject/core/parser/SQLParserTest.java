@@ -1,9 +1,11 @@
 package com.ilyaproject.core.parser;
 
+import com.ilyaproject.core.db.type.JsqlType;
 import com.ilyaproject.core.dto.expression.ExpressionNode;
 import com.ilyaproject.core.dto.expression.ExpressionUnit;
 import com.ilyaproject.core.dto.expression.ExpressionUnitType;
 import com.ilyaproject.core.dto.expression.SimpleExpression;
+import com.ilyaproject.core.dto.query.CreateTableQuery;
 import com.ilyaproject.core.dto.query.SQLQuery;
 import com.ilyaproject.core.dto.query.SelectQuery;
 import com.ilyaproject.core.dto.token.Token;
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -134,7 +137,7 @@ class SQLParserTest {
     }
 
     @Test
-    void getLisOfSelectTokensWithWhereExpressionNodeUnclosedParentheses_parsing_throwSQLException() throws Exception {
+    void getListOfSelectTokensWithWhereExpressionNodeUnclosedParentheses_parsing_throwSQLException() throws Exception {
         // Given
         List<Token> tokens = new ArrayList<>(List.of(
                 new Token(TokenType.KEYWORD, "SELECT"),
@@ -165,6 +168,140 @@ class SQLParserTest {
                 "Failed to parse SELECT statement Statement with unclosed parentheses",
                 e.getMessage()
         );
+    }
+
+    @Test
+    void getListOfCreateTableTokens_parsing_returnCreateTableQuery() throws Exception{
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "CREATE"),
+                new Token(TokenType.KEYWORD, "TABLE"),
+                new Token(TokenType.IDENTIFIER, "countries"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "country_name"),
+                new Token(TokenType.IDENTIFIER, "TEXT"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "area"),
+                new Token(TokenType.IDENTIFIER, "BIGINT"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "population"),
+                new Token(TokenType.IDENTIFIER, "BIGINT"),
+                new Token(TokenType.SYMBOL, ")")
+
+        ));
+        Map<String, JsqlType> expectedFields = Map.of(
+                "country_name", JsqlType.TEXT,
+                "area", JsqlType.BIGINT,
+                "population", JsqlType.BIGINT
+        );
+
+        // When
+        CreateTableQuery query = (CreateTableQuery) parser.parseStatement(tokens);
+
+        // Then
+        assertEquals("countries", query.tableName());
+        assertEquals(expectedFields, query.fields());
+    }
+
+    @Test
+    void getListOfCreateTableTokensNoTableName_parsing_throwIllegalArgumentException() {
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "CREATE"),
+                new Token(TokenType.KEYWORD, "TABLE"),
+                new Token(TokenType.SYMBOL, "(")
+        ));
+
+        // When / Then
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> parser.parseStatement(tokens)
+        );
+        assertEquals("Failed to parse CREATE statement Table name was not found", e.getMessage());
+    }
+
+    @Test
+    void getListOfCreateTableTokensNoOpenParentheses_parsing_throwIllegalArgumentException() {
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "CREATE"),
+                new Token(TokenType.KEYWORD, "TABLE"),
+                new Token(TokenType.IDENTIFIER, "countries"),
+                new Token(TokenType.IDENTIFIER, "country_name")
+        ));
+
+        // When / Then
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> parser.parseStatement(tokens)
+        );
+        assertEquals("Failed to parse CREATE statement Parenthesis were expected", e.getMessage());
+    }
+
+    @Test
+    void getListOfCreateTableTokensNoFieldName_parsing_throwIllegalArgumentException() {
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "CREATE"),
+                new Token(TokenType.KEYWORD, "TABLE"),
+                new Token(TokenType.IDENTIFIER, "countries"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "TEXT")
+        ));
+
+        // When / Then
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> parser.parseStatement(tokens)
+        );
+        assertEquals("Failed to parse CREATE statement Field name was not found", e.getMessage());
+    }
+
+    @Test
+    void getListOfCreateTableTokensNoFieldType_parsing_throwIllegalArgumentException() {
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "CREATE"),
+                new Token(TokenType.KEYWORD, "TABLE"),
+                new Token(TokenType.IDENTIFIER, "countries"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "country_name"),
+                new Token(TokenType.SYMBOL, "(")
+        ));
+
+        // When / Then
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> parser.parseStatement(tokens)
+        );
+        assertEquals("Failed to parse CREATE statement Field type was not found", e.getMessage());
+    }
+
+    @Test
+    void getListOfCreateTableTokensNoCloseParentheses_parsing_throwIllegalArgumentException() {
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "CREATE"),
+                new Token(TokenType.KEYWORD, "TABLE"),
+                new Token(TokenType.IDENTIFIER, "countries"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "country_name"),
+                new Token(TokenType.IDENTIFIER, "TEXT"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "area"),
+                new Token(TokenType.IDENTIFIER, "BIGINT"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "population"),
+                new Token(TokenType.IDENTIFIER, "BIGINT")
+        ));
+
+        // When / Then
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> parser.parseStatement(tokens)
+        );
+        assertEquals("Failed to parse CREATE statement Parenthesis were not closed", e.getMessage());
     }
 
 }
