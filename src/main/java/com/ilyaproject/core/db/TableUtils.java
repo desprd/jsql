@@ -1,8 +1,6 @@
 package com.ilyaproject.core.db;
 
-import com.ilyaproject.core.dto.query.SelectQuery;
 import com.ilyaproject.core.dto.table.TableDto;
-import com.ilyaproject.core.utils.DataUtils;
 
 import java.util.ArrayList;
 import java.util.List;
