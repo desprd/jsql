@@ -1,9 +1,8 @@
 package com.ilyaproject.core.parser;
 
+import com.ilyaproject.core.db.type.JsqlType;
 import com.ilyaproject.core.dto.expression.*;
-import com.ilyaproject.core.dto.query.SQLQuery;
-import com.ilyaproject.core.dto.query.SelectQuery;
-import com.ilyaproject.core.dto.query.SelectQueryBuilder;
+import com.ilyaproject.core.dto.query.*;
 import com.ilyaproject.core.dto.token.Token;
 import com.ilyaproject.core.dto.token.TokenType;
 import com.ilyaproject.core.utils.Constants;
@@ -28,7 +27,11 @@ public class SQLParser {
             parseInsert(tokens);
         }
         else if (firstToken.value().equals("CREATE") && firstToken.type() == TokenType.KEYWORD) {
-            parseCreate(tokens);
+            try {
+                query = parseCreate(tokens);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Failed to parse CREATE statement " + e.getMessage());
+            }
         }
         else if (firstToken.value().equals("DROP") && firstToken.type() == TokenType.KEYWORD) {
             parseDrop(tokens);
@@ -59,8 +62,19 @@ public class SQLParser {
         // TODO
     }
 
-    private void parseCreate(List<Token> tokens) {
-        // TODO
+    private CreateTableQuery parseCreate(List<Token> tokens) {
+        if (!tokenEquals(tokens, "TABLE", TokenType.KEYWORD)) {
+            throw new IllegalArgumentException("Wrong format for CREATE statement");
+        }
+        tokens.removeFirst();
+        CreateTableBuilder createTableBuilder = new CreateTableBuilder();
+        if (tokenEqualsByType(tokens, TokenType.IDENTIFIER)) {
+            createTableBuilder.addTableName(tokens.removeFirst().value());
+        } else {
+            throw new IllegalArgumentException("Table name was not found");
+        }
+        parseColumnsToCreate(tokens, createTableBuilder);
+        return createTableBuilder.build();
     }
 
     private void parseDrop(List<Token> tokens) {
@@ -168,6 +182,36 @@ public class SQLParser {
         return new SimpleExpression(units);
     }
 
+    private void parseColumnsToCreate(List<Token> tokens, CreateTableBuilder createTableBuilder) {
+        if (!tokenEquals(tokens, "(", TokenType.SYMBOL)){
+            throw new IllegalArgumentException("Parenthesis were expected");
+        }
+        tokens.removeFirst();
+        parseColumn(tokens, createTableBuilder);
+        if (!tokenEquals(tokens, ")", TokenType.SYMBOL)){
+            throw new IllegalArgumentException("Parenthesis were not closed");
+        }
+        tokens.removeFirst();
+    }
+
+    private void parseColumn(List<Token> tokens, CreateTableBuilder createTableBuilder) {
+        if (tokenEqualsByType(tokens, TokenType.IDENTIFIER)) {
+            String fieldName = tokens.removeFirst().value();
+            if (isValidJsqlType(tokens)) {
+                JsqlType fieldType = JsqlType.valueOf(tokens.removeFirst().value().toUpperCase());
+                createTableBuilder.addField(fieldName, fieldType);
+            } else {
+                throw new IllegalArgumentException("Field type was not found");
+            }
+            if (tokenEquals(tokens, ",", TokenType.SYMBOL)) {
+                tokens.removeFirst();
+                parseColumn(tokens, createTableBuilder);
+            }
+        } else {
+            throw new IllegalArgumentException("Field name was not found");
+        }
+    }
+
     private boolean tokenEquals(List<Token> tokens, String value, TokenType type) {
         return !tokens.isEmpty() &&
                 tokens.getFirst().value().equals(value) &&
@@ -183,6 +227,12 @@ public class SQLParser {
         return !tokens.isEmpty() &&
                 Constants.VALID_EXPRESSION_SYMBOLS.contains(tokens.getFirst().value()) &&
                 tokens.getFirst().type() == TokenType.SYMBOL;
+    }
+
+    private boolean isValidJsqlType(List<Token> tokens) {
+        return !tokens.isEmpty() &&
+                tokens.getFirst().type() == TokenType.IDENTIFIER &&
+                Constants.JSQL_TYPES.contains(tokens.getFirst().value().toUpperCase());
     }
 
 }
