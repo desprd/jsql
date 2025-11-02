@@ -72,7 +72,7 @@ public class SQLParser {
             tokens.removeFirst();
         }
         if (tokenEquals(tokens, "*", TokenType.SYMBOL)) {
-            queryBuilder.addColumn(tokens.removeFirst().value());
+            tokens.removeFirst();
         } else if (tokenEqualsByType(tokens, TokenType.IDENTIFIER)) {
             queryBuilder.addColumn(tokens.removeFirst().value());
             if (tokenEquals(tokens, ",", TokenType.SYMBOL)) {

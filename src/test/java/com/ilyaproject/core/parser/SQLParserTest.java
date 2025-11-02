@@ -27,6 +27,28 @@ class SQLParserTest {
     }
 
     @Test
+    void getListOfSelectTokensAllColumnsNoExpression_parsing_returnSelectQuery() throws Exception {
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "SELECT"),
+                new Token(TokenType.SYMBOL, "*"),
+                new Token(TokenType.KEYWORD, "FROM"),
+                new Token(TokenType.IDENTIFIER, "countries")
+
+        ));
+
+        // When
+        SQLQuery query = parser.parseStatement(tokens);
+
+        // Then
+        assertInstanceOf(SelectQuery.class, query);
+        SelectQuery selectQuery = (SelectQuery) query;
+        assertEquals(List.of("countries"), selectQuery.tables());
+        assertTrue(selectQuery.columns().isEmpty());
+        assertNull(selectQuery.conditions());
+    }
+
+    @Test
     void getLisOfSelectTokensWithWhereSimpleExpression_parsing_returnSelectQuery() throws Exception {
         // Given
         List<Token> tokens = new ArrayList<>(List.of(
