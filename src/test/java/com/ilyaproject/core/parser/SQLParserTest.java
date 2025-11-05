@@ -1,5 +1,6 @@
 package com.ilyaproject.core.parser;
 
+import com.ilyaproject.core.db.Database;
 import com.ilyaproject.core.db.type.JsqlType;
 import com.ilyaproject.core.dto.expression.ExpressionNode;
 import com.ilyaproject.core.dto.expression.ExpressionUnit;

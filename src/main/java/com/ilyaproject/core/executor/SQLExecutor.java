@@ -1,6 +1,7 @@
 package com.ilyaproject.core.executor;
 
 import com.ilyaproject.core.dto.executor.SQLResponse;
+import com.ilyaproject.core.dto.query.CreateTableQuery;
 import com.ilyaproject.core.dto.query.SQLQuery;
 import com.ilyaproject.core.dto.query.SelectQuery;
 import com.ilyaproject.core.db.Database;
@@ -12,7 +13,9 @@ public class SQLExecutor {
 
     private final Map<Class<? extends SQLQuery>, StatementExecutor<? extends SQLQuery>> EXECUTORS = Map.of(
         SelectQuery.class,
-        new SelectExecutor()
+        new SelectExecutor(),
+        CreateTableQuery.class,
+        new CreateTableExecutor()
     );
 
     @SuppressWarnings("unchecked")

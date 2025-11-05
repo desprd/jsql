@@ -1,5 +1,7 @@
 package com.ilyaproject.core.db;
 
+import com.ilyaproject.core.db.type.JsqlType;
+import com.ilyaproject.core.dto.query.CreateTableQuery;
 import com.ilyaproject.core.dto.table.TableDto;
 
 import java.util.ArrayList;
@@ -24,5 +26,21 @@ public class TableUtils {
             desiredTables.add(tableToAdd.getTableData());
         }
         return desiredTables;
+    }
+
+    public static void createTable(CreateTableQuery query, Database db) {
+        Map<String, JsqlType> schema = query.fields();
+        if (schema.isEmpty()) {
+            throw new IllegalArgumentException("CREATE TABLE statement supposed to have schema");
+        }
+        String name = query.tableName();
+        if (name.isBlank()) {
+            throw new IllegalArgumentException("CREATE TABLE statement supposed to have name");
+        }
+        Map<String, Table> allTables = db.getTables();
+        if (allTables.containsKey(name)) {
+            throw new IllegalArgumentException("Table " + name + " already exists");
+        }
+        db.createTable(name, schema);
     }
 }
