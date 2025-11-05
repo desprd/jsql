@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class SelectExecutor implements StatementExecutor<SelectQuery>{
+class SelectExecutor implements StatementExecutor<SelectQuery> {
     @Override
     public SQLResponse get(SelectQuery query, Database db) {
         List<TableDto> tables = TableUtils.getTablesByTablesNames(query.tables(), db);

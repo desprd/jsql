@@ -30,7 +30,7 @@ class SQLParserTest {
     }
 
     @Test
-    void getListOfSelectTokensAllColumnsNoExpression_parsing_returnSelectQuery() throws Exception {
+    void getListOfSelectTokensAllColumnsNoExpression_parsing_returnSelectQuery() {
         // Given
         List<Token> tokens = new ArrayList<>(List.of(
                 new Token(TokenType.KEYWORD, "SELECT"),
@@ -52,7 +52,7 @@ class SQLParserTest {
     }
 
     @Test
-    void getLisOfSelectTokensWithWhereSimpleExpression_parsing_returnSelectQuery() throws Exception {
+    void getLisOfSelectTokensWithWhereSimpleExpression_parsing_returnSelectQuery() {
         // Given
         List<Token> tokens = new ArrayList<>(List.of(
                 new Token(TokenType.KEYWORD, "SELECT"),
@@ -93,7 +93,7 @@ class SQLParserTest {
     }
 
     @Test
-    void getLisOfSelectTokensWithWhereExpressionNode_parsing_returnSelectQuery() throws Exception {
+    void getLisOfSelectTokensWithWhereExpressionNode_parsing_returnSelectQuery() {
         // Given
         List<Token> tokens = new ArrayList<>(List.of(
                 new Token(TokenType.KEYWORD, "SELECT"),
@@ -137,7 +137,7 @@ class SQLParserTest {
     }
 
     @Test
-    void getListOfSelectTokensWithWhereExpressionNodeUnclosedParentheses_parsing_throwSQLException() throws Exception {
+    void getListOfSelectTokensWithWhereExpressionNodeUnclosedParentheses_parsing_throwIllegalArgumentException() {
         // Given
         List<Token> tokens = new ArrayList<>(List.of(
                 new Token(TokenType.KEYWORD, "SELECT"),
@@ -160,8 +160,8 @@ class SQLParserTest {
         ));
 
         // When / Then
-        SQLException e = assertThrows(
-                SQLException.class,
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
                 () -> parser.parseStatement(tokens)
         );
         assertEquals(
@@ -171,7 +171,7 @@ class SQLParserTest {
     }
 
     @Test
-    void getListOfCreateTableTokens_parsing_returnCreateTableQuery() throws Exception{
+    void getListOfCreateTableTokens_parsing_returnCreateTableQuery() {
         // Given
         List<Token> tokens = new ArrayList<>(List.of(
                 new Token(TokenType.KEYWORD, "CREATE"),

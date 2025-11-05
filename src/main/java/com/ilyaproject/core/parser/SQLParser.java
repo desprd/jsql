@@ -7,20 +7,18 @@ import com.ilyaproject.core.dto.token.Token;
 import com.ilyaproject.core.dto.token.TokenType;
 import com.ilyaproject.core.utils.Constants;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SQLParser {
-
-    public SQLQuery parseStatement(List<Token> tokens) throws SQLException {
+    public SQLQuery parseStatement(List<Token> tokens){
         SQLQuery query = null;
         Token firstToken = tokens.removeFirst();
         if (firstToken.value().equals("SELECT") && firstToken.type() == TokenType.KEYWORD) {
             try {
                 query = parseSelect(tokens);
-            } catch (SQLException e) {
-                throw new SQLException("Failed to parse SELECT statement " + e.getMessage());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Failed to parse SELECT statement " + e.getMessage());
             }
         }
         else if (firstToken.value().equals("INSERT") && firstToken.type() == TokenType.KEYWORD) {
@@ -37,19 +35,19 @@ public class SQLParser {
             parseDrop(tokens);
         }
         else {
-            throw new SQLException("Unexpected statement starts with " + firstToken.value());
+            throw new IllegalArgumentException("Unexpected statement starts with " + firstToken.value());
         }
         return query;
     }
 
-    private SelectQuery parseSelect(List<Token> tokens) throws SQLException{
+    private SelectQuery parseSelect(List<Token> tokens) {
         SelectQueryBuilder queryBuilder = new SelectQueryBuilder();
         parseColumnList(tokens, queryBuilder);
         if (tokenEquals(tokens, "FROM", TokenType.KEYWORD)) {
             tokens.removeFirst();
             parseFromClause(tokens, queryBuilder);
         } else {
-            throw new SQLException("Keyword FROM is necessary after SELECT");
+            throw new IllegalArgumentException("Keyword FROM is necessary after SELECT");
         }
         if (tokenEquals(tokens, "WHERE", TokenType.KEYWORD)) {
             tokens.removeFirst();
@@ -81,7 +79,7 @@ public class SQLParser {
         // TODO
     }
 
-    private void parseColumnList(List<Token> tokens, SelectQueryBuilder queryBuilder) throws SQLException{
+    private void parseColumnList(List<Token> tokens, SelectQueryBuilder queryBuilder) {
         if (tokenEquals(tokens, "(", TokenType.SYMBOL)) {
             tokens.removeFirst();
         }
@@ -94,14 +92,14 @@ public class SQLParser {
                 parseColumnList(tokens, queryBuilder);
             }
         } else {
-            throw new SQLException("Unexpected value after SELECT - " + tokens.getFirst().value());
+            throw new IllegalArgumentException("Unexpected value after SELECT - " + tokens.getFirst().value());
         }
         if (tokenEquals(tokens, ")", TokenType.SYMBOL)) {
             tokens.removeFirst();
         }
     }
 
-    private void parseFromClause(List<Token> tokens, SelectQueryBuilder queryBuilder) throws SQLException {
+    private void parseFromClause(List<Token> tokens, SelectQueryBuilder queryBuilder) {
         if (tokenEquals(tokens, "(", TokenType.SYMBOL)) {
             tokens.removeFirst();
         }
@@ -112,7 +110,7 @@ public class SQLParser {
                 parseFromClause(tokens, queryBuilder);
             }
         } else {
-            throw new SQLException("Unexpected value after SELECT " + tokens.getFirst().value());
+            throw new IllegalArgumentException("Unexpected value after SELECT " + tokens.getFirst().value());
         }
         if (tokenEquals(tokens, ")", TokenType.SYMBOL)) {
             tokens.removeFirst();
@@ -120,12 +118,12 @@ public class SQLParser {
 
     }
 
-    private void parseWhereClause(List<Token> tokens, SelectQueryBuilder queryBuilder) throws SQLException{
+    private void parseWhereClause(List<Token> tokens, SelectQueryBuilder queryBuilder){
         Expression expression = parseExpression(tokens);
         queryBuilder.addConditions(expression);
     }
 
-    private Expression parseExpression(List<Token> tokens) throws SQLException{
+    private Expression parseExpression(List<Token> tokens){
         Expression left = parseTerm(tokens);
         while (
                 tokenEquals(tokens, "AND", TokenType.KEYWORD) ||
@@ -138,14 +136,14 @@ public class SQLParser {
         return left;
     }
 
-    private Expression parseTerm(List<Token> tokens) throws SQLException{
+    private Expression parseTerm(List<Token> tokens){
         if (tokenEquals(tokens, "(", TokenType.SYMBOL)) {
             tokens.removeFirst();
             Expression expression = parseExpression(tokens);
             if (tokenEquals(tokens, ")", TokenType.SYMBOL)) {
                 tokens.removeFirst();
             } else {
-                throw new SQLException("Statement with unclosed parentheses");
+                throw new IllegalArgumentException("Statement with unclosed parentheses");
             }
             return expression;
         } else {
