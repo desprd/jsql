@@ -1,8 +1,6 @@
 package com.ilyaproject.core.db;
 
-import com.ilyaproject.core.dto.table.TableDto;
 import com.ilyaproject.core.db.type.JsqlType;
-import com.ilyaproject.core.utils.DataUtils;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -30,15 +28,28 @@ public final class Database {
         }
     }
 
+    // For testing only, never use in production
+    public static void removeInstance() {
+        if (instance == null) {
+            return;
+        }
+        synchronized (Database.class) {
+            if (instance != null) {
+                instance = null;
+            }
+        }
+    }
+
     Map<String, Table> getTables() {
         return tables;
     }
 
-    public void createTable(String name, Map<String, JsqlType> schema) {
+    void createTable(String name, Map<String, JsqlType> schema) {
         tables.put(name, new Table(name, schema));
     }
 
-    public void insert(String name, Map<String, Object> rowData) {
+    // TODO
+    void insert(String name, Map<String, Object> rowData) {
         Table table = tables.get(name);
         if (table != null) {
             try {
@@ -51,11 +62,4 @@ public final class Database {
         }
     }
 
-    public TableDto select(String name) {
-        Table table = tables.get(name);
-        if (table != null){
-            return table.getTableData();
-        }
-        return DataUtils.getEmptyTableDto();
-    }
 }
