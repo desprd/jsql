@@ -71,7 +71,7 @@ class SelectExecutorTest {
     }
 
     @Test
-    void selectQueryAllColumnsAndNoConditions_executeSelect_returnSQLResponse() {
+    void selectQueryAllColumnsAndNoConditions_executeSelect_returnSuccessfulSQLResponse() {
         // Given
         query = new SelectQueryBuilder()
                 .addTable("products")
@@ -92,7 +92,7 @@ class SelectExecutorTest {
     }
 
     @Test
-    void selectQueryChosenColumnsAndNoConditions_executeSelect_returnSQLResponse() {
+    void selectQueryChosenColumnsAndNoConditions_executeSelect_returnSuccessfulSQLResponse() {
         // Given
         query = new SelectQueryBuilder()
                 .addTable("products")
@@ -127,7 +127,7 @@ class SelectExecutorTest {
     }
 
     @Test
-    void selectQueryWithSimpleCondition_executeSelect_returnSQLResponse() {
+    void selectQueryWithSimpleCondition_executeSelect_returnSuccessfulSQLResponse() {
         query = new SelectQueryBuilder()
                 .addTable("products")
                 .addColumn("name")
@@ -158,7 +158,7 @@ class SelectExecutorTest {
     }
 
     @Test
-    void selectQueryWithAndCondition_executeSelect_returnSQLResponse() {
+    void selectQueryWithAndCondition_executeSelect_returnSuccessfulSQLResponse() {
         // Given
         ExpressionNode andNode = new ExpressionNode("AND", leftExpr, rightExpr);
         query = new SelectQueryBuilder()
@@ -190,7 +190,7 @@ class SelectExecutorTest {
     }
 
     @Test
-    void selectQueryWithOrCondition_executeSelect_returnSQLResponse() {
+    void selectQueryWithOrCondition_executeSelect_returnSuccessfulSQLResponse() {
         // Given
         ExpressionNode andNode = new ExpressionNode("OR", leftExpr, rightExpr);
         query = new SelectQueryBuilder()
@@ -226,7 +226,7 @@ class SelectExecutorTest {
     }
 
     @Test
-    void selectQueryWithWrongFormatSimpleCondition_executeSelect_throwIllegalArgumentException() {
+    void selectQueryWithWrongFormatSimpleCondition_executeSelect_returnFailedSQLResponse() {
         // Given
         List<ExpressionUnit> units = List.of(
                 new ExpressionUnit("id", ExpressionUnitType.TEXT),
@@ -240,23 +240,23 @@ class SelectExecutorTest {
                 .addTable("products")
                 .addConditions(wrongFormatExpression)
                 .build();
+        String expectedMessage = "Failed to select: Wrong expression format in WHERE block";
 
         // When
-        IllegalArgumentException e;
+        SQLResponse response;
         try (MockedStatic<TableUtils> utilities = mockStatic(TableUtils.class)) {
             utilities.when(() -> TableUtils.getTablesByTablesNames(any(), any())).thenReturn(List.of(productsTable));
-            e = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> executor.get(query, Database.getInstance())
-            );
+            response = executor.get(query, Database.getInstance());
         }
 
         // Then
-        assertEquals("Wrong expression format in WHERE block", e.getMessage());
+        assertFalse(response.success());
+        assertTrue(response.data().isEmpty());
+        assertEquals(expectedMessage, response.responseMessage());
     }
 
     @Test
-    void selectQueryWithNotExistingFieldInSimpleCondition_executeSelect_throwIllegalArgumentException() {
+    void selectQueryWithNotExistingFieldInSimpleCondition_executeSelect_returnFailedSQLResponse() {
         // Given
         List<ExpressionUnit> units = List.of(
                 new ExpressionUnit("quality", ExpressionUnitType.TEXT),
@@ -268,23 +268,23 @@ class SelectExecutorTest {
                 .addTable("products")
                 .addConditions(wrongFormatExpression)
                 .build();
+        String expectedMessage = "Failed to select: WHERE expression contains field that wasn't found in table";
 
         // When
-        IllegalArgumentException e;
+        SQLResponse response;
         try (MockedStatic<TableUtils> utilities = mockStatic(TableUtils.class)) {
             utilities.when(() -> TableUtils.getTablesByTablesNames(any(), any())).thenReturn(List.of(productsTable));
-            e = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> executor.get(query, Database.getInstance())
-            );
+            response = executor.get(query, Database.getInstance());
         }
 
         // Then
-        assertEquals("WHERE expression contains field that wasn't found in table", e.getMessage());
+        assertFalse(response.success());
+        assertTrue(response.data().isEmpty());
+        assertEquals(expectedMessage, response.responseMessage());
     }
 
     @Test
-    void selectQueryWithUnknownSymbolInSimpleCondition_executeSelect_throwIllegalArgumentException() {
+    void selectQueryWithUnknownSymbolInSimpleCondition_executeSelect_returnFailedSQLResponse() {
         // Given
         List<ExpressionUnit> units = List.of(
                 new ExpressionUnit("price", ExpressionUnitType.TEXT),
@@ -296,19 +296,19 @@ class SelectExecutorTest {
                 .addTable("products")
                 .addConditions(wrongFormatExpression)
                 .build();
+        String expectedMessage = "Failed to select: Operator % is not allowed";
 
         // When
-        IllegalArgumentException e;
+        SQLResponse response;
         try (MockedStatic<TableUtils> utilities = mockStatic(TableUtils.class)) {
             utilities.when(() -> TableUtils.getTablesByTablesNames(any(), any())).thenReturn(List.of(productsTable));
-            e = assertThrows(
-                    IllegalArgumentException.class,
-                    () -> executor.get(query, Database.getInstance())
-            );
+            response = executor.get(query, Database.getInstance());
         }
 
         // Then
-        assertEquals("Operator % is not allowed", e.getMessage());
+        assertFalse(response.success());
+        assertTrue(response.data().isEmpty());
+        assertEquals(expectedMessage, response.responseMessage());
     }
 
 }

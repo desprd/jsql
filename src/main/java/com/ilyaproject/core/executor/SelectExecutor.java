@@ -16,10 +16,21 @@ import java.util.stream.Stream;
 class SelectExecutor implements StatementExecutor<SelectQuery> {
     @Override
     public SQLResponse get(SelectQuery query, Database db) {
-        List<TableDto> tables = TableUtils.getTablesByTablesNames(query.tables(), db);
-        tables = applyConditions(tables, query.conditions());
-        extractRequiredColumns(tables, query.columns());
-        return new SQLResponse(true, "SELECTED", Optional.of(tables));
+        try {
+            List<TableDto> tables = TableUtils.getTablesByTablesNames(query.tables(), db);
+            tables = applyConditions(tables, query.conditions());
+            extractRequiredColumns(tables, query.columns());
+            return new SQLResponse(
+                    true,
+                    "Selected",
+                    Optional.of(tables)
+            );
+        } catch (Exception e) {
+            return new SQLResponse(
+                    false,
+                    "Failed to select: " + e.getMessage(),
+                    Optional.empty());
+        }
     }
 
     private void extractRequiredColumns(List<TableDto> tables, List<String> columns) {
