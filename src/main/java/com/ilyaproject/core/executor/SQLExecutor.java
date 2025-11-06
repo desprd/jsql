@@ -23,7 +23,7 @@ public class SQLExecutor {
         if (query == null) {
             throw new IllegalArgumentException("SQLQuery cannot be null");
         }
-        StatementExecutor<SQLQuery> executor = (StatementExecutor<SQLQuery>) EXECUTORS.get(query);
+        StatementExecutor<SQLQuery> executor = (StatementExecutor<SQLQuery>) EXECUTORS.get(query.getClass());
         if (executor == null) {
             throw new SQLException(
                     "Statement executor for SQLQuery type " +

@@ -1,5 +1,6 @@
 open module com.ilyaproject.api {
     requires java.sql;
+    requires java.xml.crypto;
     exports com.ilyaproject.api.cli;
     exports com.ilyaproject.api.driver;
     exports com.ilyaproject.core.dto.executor;

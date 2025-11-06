@@ -8,8 +8,8 @@ import com.ilyaproject.core.utils.Constants;
 import java.util.ArrayList;
 import java.util.List;
 
-final class SQLTokenizer {
-    List<Token> tokenize(String rowSql) {
+public final class SQLTokenizer {
+    public List<Token> tokenize(String rowSql) {
         List<Token> tokens = new ArrayList<>();
         char[] rowSqlCharacters = rowSql.toCharArray();
         int pointer = 0;
