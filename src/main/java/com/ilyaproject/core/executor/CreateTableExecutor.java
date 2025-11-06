@@ -7,7 +7,7 @@ import com.ilyaproject.core.dto.query.CreateTableQuery;
 
 import java.util.Optional;
 
-public class CreateTableExecutor implements StatementExecutor<CreateTableQuery>{
+class CreateTableExecutor implements StatementExecutor<CreateTableQuery>{
     @Override
     public SQLResponse get(CreateTableQuery query, Database db) {
         try {
