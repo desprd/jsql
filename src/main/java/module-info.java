@@ -1,10 +1,8 @@
-open module com.ilyaproject.core {
+open module com.ilyaproject.api {
     requires java.sql;
-    exports com.ilyaproject.core.db;
-    exports com.ilyaproject.core.parser;
-    exports com.ilyaproject.core.utils;
-    exports com.ilyaproject.core.dto.expression;
-    exports com.ilyaproject.core.dto.query;
-    exports com.ilyaproject.core.dto.token;
+    exports com.ilyaproject.api.cli;
+    exports com.ilyaproject.api.driver;
+    exports com.ilyaproject.core.dto.executor;
     exports com.ilyaproject.core.dto.table;
+    exports com.ilyaproject.core.db.type;
 }
