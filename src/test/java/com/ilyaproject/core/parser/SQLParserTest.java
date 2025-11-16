@@ -1,12 +1,12 @@
 package com.ilyaproject.core.parser;
 
-import com.ilyaproject.core.db.Database;
 import com.ilyaproject.core.db.type.JsqlType;
 import com.ilyaproject.core.dto.expression.ExpressionNode;
 import com.ilyaproject.core.dto.expression.ExpressionUnit;
 import com.ilyaproject.core.dto.expression.ExpressionUnitType;
 import com.ilyaproject.core.dto.expression.SimpleExpression;
 import com.ilyaproject.core.dto.query.CreateTableQuery;
+import com.ilyaproject.core.dto.query.InsertIntoQuery;
 import com.ilyaproject.core.dto.query.SQLQuery;
 import com.ilyaproject.core.dto.query.SelectQuery;
 import com.ilyaproject.core.dto.token.Token;
@@ -14,8 +14,8 @@ import com.ilyaproject.core.dto.token.TokenType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -303,6 +303,302 @@ class SQLParserTest {
                 () -> parser.parseStatement(tokens)
         );
         assertEquals("Failed to parse CREATE statement Parenthesis were not closed", e.getMessage());
+    }
+
+    @Test
+    void getListOfInsertIntoTokens_parsing_returnInsertIntoQuery() {
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "INSERT"),
+                new Token(TokenType.KEYWORD, "INTO"),
+                new Token(TokenType.IDENTIFIER, "countries"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "country_name"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "area"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "population"),
+                new Token(TokenType.SYMBOL, ")"),
+                new Token(TokenType.KEYWORD, "VALUES"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "USA"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "9867000"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "348000000"),
+                new Token(TokenType.SYMBOL, ")")
+        ));
+        HashMap<String, String> rowsValues = new HashMap<>(
+                Map.of(
+                        "country_name", "USA",
+                        "area", "9867000",
+                        "population", "348000000"
+                )
+        );
+        InsertIntoQuery expectedQuery = new InsertIntoQuery("countries", rowsValues);
+
+        // When
+        SQLQuery resultQuery = parser.parseStatement(tokens);
+
+        //Then
+        assertInstanceOf(InsertIntoQuery.class, resultQuery);
+        assertEquals(expectedQuery, resultQuery);
+    }
+
+    @Test
+    void getListOfInsertIntoTokensMoreValuesThanColumns_parsing_throwIllegalArgumentException() {
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "INSERT"),
+                new Token(TokenType.KEYWORD, "INTO"),
+                new Token(TokenType.IDENTIFIER, "countries"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "country_name"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "area"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "population"),
+                new Token(TokenType.SYMBOL, ")"),
+                new Token(TokenType.KEYWORD, "VALUES"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "something"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "USA"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "9867000"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "348000000"),
+                new Token(TokenType.SYMBOL, ")")
+        ));
+
+        // When
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> parser.parseStatement(tokens)
+        );
+
+        // Then
+        assertEquals(
+                "Failed to parse INSERT statement Number of line to insert doesn't match" +
+                        " with numbers with given columns",
+                e.getMessage()
+        );
+    }
+
+    @Test
+    void getListOfInsertIntoTokensNoIntoKeyWord_parsing_throwIllegalArgumentException() {
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "INSERT"),
+                new Token(TokenType.IDENTIFIER, "countries"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "country_name"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "area"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "population"),
+                new Token(TokenType.SYMBOL, ")"),
+                new Token(TokenType.KEYWORD, "VALUES"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "USA"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "9867000"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "348000000"),
+                new Token(TokenType.SYMBOL, ")")
+        ));
+
+        // When
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> parser.parseStatement(tokens)
+        );
+
+        // Then
+        assertEquals(
+                "Failed to parse INSERT statement Wrong format for INSERT statement",
+                e.getMessage()
+        );
+    }
+
+    @Test
+    void getListOfInsertIntoTokensNoTableName_parsing_throwIllegalArgumentException() {
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "INSERT"),
+                new Token(TokenType.KEYWORD, "INTO"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "country_name"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "area"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "population"),
+                new Token(TokenType.SYMBOL, ")"),
+                new Token(TokenType.KEYWORD, "VALUES"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "USA"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "9867000"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "348000000"),
+                new Token(TokenType.SYMBOL, ")")
+        ));
+
+        // When
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> parser.parseStatement(tokens)
+        );
+
+        // Then
+        assertEquals(
+                "Failed to parse INSERT statement Table name was not found",
+                e.getMessage()
+        );
+    }
+
+    @Test
+    void getListOfInsertIntoTokensNoValuesKeyWord_parsing_throwIllegalArgumentException() {
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "INSERT"),
+                new Token(TokenType.KEYWORD, "INTO"),
+                new Token(TokenType.IDENTIFIER, "countries"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "country_name"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "area"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "population"),
+                new Token(TokenType.SYMBOL, ")"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "USA"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "9867000"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "348000000"),
+                new Token(TokenType.SYMBOL, ")")
+        ));
+
+        // When
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> parser.parseStatement(tokens)
+        );
+
+        // Then
+        assertEquals(
+                "Failed to parse INSERT statement Wrong format for INSERT statement",
+                e.getMessage()
+        );
+    }
+
+    @Test
+    void getListOfInsertIntoTokensNoOpenParentheses_parsing_throwIllegalArgumentException() {
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "INSERT"),
+                new Token(TokenType.KEYWORD, "INTO"),
+                new Token(TokenType.IDENTIFIER, "countries"),
+                new Token(TokenType.IDENTIFIER, "country_name"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "area"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "population"),
+                new Token(TokenType.SYMBOL, ")"),
+                new Token(TokenType.KEYWORD, "VALUES"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "USA"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "9867000"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "348000000"),
+                new Token(TokenType.SYMBOL, ")")
+        ));
+
+        // When
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> parser.parseStatement(tokens)
+        );
+
+        // Then
+        assertEquals(
+                "Failed to parse INSERT statement Parenthesis were expected",
+                e.getMessage()
+        );
+    }
+
+    @Test
+    void getListOfInsertIntoTokensNoClosingParentheses_parsing_throwIllegalArgumentException() {
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "INSERT"),
+                new Token(TokenType.KEYWORD, "INTO"),
+                new Token(TokenType.IDENTIFIER, "countries"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "country_name"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "area"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "population"),
+                new Token(TokenType.KEYWORD, "VALUES"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "USA"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "9867000"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "348000000"),
+                new Token(TokenType.SYMBOL, ")")
+        ));
+
+        // When
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> parser.parseStatement(tokens)
+        );
+
+        // Then
+        assertEquals(
+                "Failed to parse INSERT statement Parenthesis were not closed",
+                e.getMessage()
+        );
+    }
+
+    @Test
+    void getListOfInsertIntoTokensInaccurateDataSequence_parsing_throwIllegalArgumentException() {
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "INSERT"),
+                new Token(TokenType.KEYWORD, "INTO"),
+                new Token(TokenType.IDENTIFIER, "countries"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "country_name"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "area"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.SYMBOL, ")"),
+                new Token(TokenType.KEYWORD, "VALUES"),
+                new Token(TokenType.SYMBOL, "("),
+                new Token(TokenType.IDENTIFIER, "USA"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "9867000"),
+                new Token(TokenType.SYMBOL, ","),
+                new Token(TokenType.IDENTIFIER, "348000000"),
+                new Token(TokenType.SYMBOL, ")")
+        ));
+
+        // When
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> parser.parseStatement(tokens)
+        );
+
+        // Then
+        assertEquals(
+                "Failed to parse INSERT statement Field name was not found",
+                e.getMessage()
+        );
     }
 
 }

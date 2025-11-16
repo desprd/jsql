@@ -22,7 +22,11 @@ public class SQLParser {
             }
         }
         else if (firstToken.value().equals("INSERT") && firstToken.type() == TokenType.KEYWORD) {
-            parseInsert(tokens);
+            try {
+                query = parseInsert(tokens);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Failed to parse INSERT statement " + e.getMessage());
+            }
         }
         else if (firstToken.value().equals("CREATE") && firstToken.type() == TokenType.KEYWORD) {
             try {
@@ -56,8 +60,34 @@ public class SQLParser {
         return queryBuilder.build();
     }
 
-    private void parseInsert(List<Token> tokens) {
-        // TODO
+    private InsertIntoQuery parseInsert(List<Token> tokens) {
+        if (!tokenEquals(tokens, "INTO", TokenType.KEYWORD)) {
+            throw new IllegalArgumentException("Wrong format for INSERT statement");
+        }
+        tokens.removeFirst();
+        InsertIntoQueryBuilder insertIntoQueryBuilder = new InsertIntoQueryBuilder();
+        if (tokenEqualsByType(tokens, TokenType.IDENTIFIER)) {
+            insertIntoQueryBuilder.addTableName(tokens.removeFirst().value());
+        } else {
+            throw new IllegalArgumentException("Table name was not found");
+        }
+        List<String> columns = new ArrayList<>();
+        parseInsertData(tokens, columns);
+        if (!tokenEquals(tokens, "VALUES", TokenType.KEYWORD)) {
+            throw new IllegalArgumentException("Wrong format for INSERT statement");
+        }
+        tokens.removeFirst();
+        List<String> values = new ArrayList<>();
+        parseInsertData(tokens, values);
+        if (columns.size() != values.size()) {
+            throw new IllegalArgumentException(
+                    "Number of line to insert doesn't match with numbers with given columns"
+            );
+        }
+        for (int i = 0; i < values.size(); i++) {
+            insertIntoQueryBuilder.addValuesToColumns(columns.get(i), values.get(i));
+        }
+        return insertIntoQueryBuilder.build();
     }
 
     private CreateTableQuery parseCreate(List<Token> tokens) {
@@ -204,6 +234,30 @@ public class SQLParser {
             if (tokenEquals(tokens, ",", TokenType.SYMBOL)) {
                 tokens.removeFirst();
                 parseColumn(tokens, createTableBuilder);
+            }
+        } else {
+            throw new IllegalArgumentException("Field name was not found");
+        }
+    }
+
+    private void parseInsertData(List<Token> tokens, List<String> columns) {
+        if (!tokenEquals(tokens, "(", TokenType.SYMBOL)){
+            throw new IllegalArgumentException("Parenthesis were expected");
+        }
+        tokens.removeFirst();
+        parseInsertLine(tokens, columns);
+        if (!tokenEquals(tokens, ")", TokenType.SYMBOL)){
+            throw new IllegalArgumentException("Parenthesis were not closed");
+        }
+        tokens.removeFirst();
+    }
+
+    private void parseInsertLine(List<Token> tokens, List<String> columns) {
+        if (tokenEqualsByType(tokens, TokenType.IDENTIFIER)) {
+            columns.add(tokens.removeFirst().value());
+            if (tokenEquals(tokens, ",", TokenType.SYMBOL)) {
+                tokens.removeFirst();
+                parseInsertLine(tokens, columns);
             }
         } else {
             throw new IllegalArgumentException("Field name was not found");

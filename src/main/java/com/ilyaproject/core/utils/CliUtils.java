@@ -1,7 +1,5 @@
 package com.ilyaproject.core.utils;
 
-
-
 import com.ilyaproject.core.dto.table.TableDto;
 import com.ilyaproject.core.db.type.JsqlType;
 
