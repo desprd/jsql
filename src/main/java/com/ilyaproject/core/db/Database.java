@@ -5,6 +5,7 @@ import com.ilyaproject.core.db.type.JsqlType;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public final class Database {
 
@@ -48,7 +49,6 @@ public final class Database {
         tables.put(name, new Table(name, schema));
     }
 
-    // TODO
     void insert(String name, Map<String, Object> rowData) {
         Table table = tables.get(name);
         if (table != null) {
@@ -60,6 +60,13 @@ public final class Database {
         } else {
             System.err.printf("FAILURE: table %s was not found in database%n", name);
         }
+    }
+
+    Optional<Table> getTableByName(String tableName) {
+        if (tables.containsKey(tableName)) {
+            return Optional.of(tables.get(tableName));
+        }
+        return Optional.empty();
     }
 
 }

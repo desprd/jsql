@@ -2,6 +2,7 @@ package com.ilyaproject.core.executor;
 
 import com.ilyaproject.core.dto.executor.SQLResponse;
 import com.ilyaproject.core.dto.query.CreateTableQuery;
+import com.ilyaproject.core.dto.query.InsertIntoQuery;
 import com.ilyaproject.core.dto.query.SQLQuery;
 import com.ilyaproject.core.dto.query.SelectQuery;
 import com.ilyaproject.core.db.Database;
@@ -15,7 +16,9 @@ public class SQLExecutor {
         SelectQuery.class,
         new SelectExecutor(),
         CreateTableQuery.class,
-        new CreateTableExecutor()
+        new CreateTableExecutor(),
+        InsertIntoQuery.class,
+        new InsertIntoExecutor()
     );
 
     @SuppressWarnings("unchecked")

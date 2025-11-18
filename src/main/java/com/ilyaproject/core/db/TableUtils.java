@@ -2,11 +2,11 @@ package com.ilyaproject.core.db;
 
 import com.ilyaproject.core.db.type.JsqlType;
 import com.ilyaproject.core.dto.query.CreateTableQuery;
+import com.ilyaproject.core.dto.query.InsertIntoQuery;
 import com.ilyaproject.core.dto.table.TableDto;
+import com.ilyaproject.core.utils.DataUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TableUtils {
 
@@ -42,5 +42,47 @@ public class TableUtils {
             throw new IllegalArgumentException("Table " + name + " already exists");
         }
         db.createTable(name, schema);
+    }
+
+    public static void insertIntoTable(InsertIntoQuery query, Database db) {
+        Map<String, Object> dataToInsert = new HashMap<>();
+        Optional<Table> fetchedTable = db.getTableByName(query.tableName());
+        if (fetchedTable.isEmpty()) {
+            throw new IllegalArgumentException("Table " + query.tableName() + " was not found in database");
+        }
+        Table tableToInsert = fetchedTable.get();
+        Map<String, JsqlType> schema = tableToInsert.getTableData().schema();
+        for (String columnName: query.columnsToValues().keySet()) {
+            if (!schema.containsKey(columnName)) {
+                throw new IllegalArgumentException(
+                        query.tableName() +
+                        " table's schema doesn't contains column " +
+                        columnName
+                );
+            }
+            dataToInsert.put(columnName, parseToCorrectObject(query.columnsToValues().get(columnName), schema.get(columnName)));
+        }
+        db.insert(query.tableName(), dataToInsert);
+    }
+
+    private static Object parseToCorrectObject(String value, JsqlType type) {
+        try {
+            return switch (type) {
+                case INTEGER -> Integer.parseInt(value);
+                case BOOLEAN -> {
+                    if (value.equalsIgnoreCase("true")) yield true;
+                    else if (value.equalsIgnoreCase("false")) yield false;
+                    throw new IllegalArgumentException(
+                            "Type of value to insert " + value + " doesn't match required type Boolean for this column"
+                    );
+                }
+                case BIGINT -> Long.parseLong(value);
+                default -> value;
+            };
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    "Type of value to insert " + value + " doesn't match required type " + type.name() + " for this column"
+            );
+        }
     }
 }
