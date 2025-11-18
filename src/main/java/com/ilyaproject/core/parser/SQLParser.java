@@ -72,13 +72,13 @@ public class SQLParser {
             throw new IllegalArgumentException("Table name was not found");
         }
         List<String> columns = new ArrayList<>();
-        parseInsertData(tokens, columns);
+        parseInsertData(tokens, columns, false);
         if (!tokenEquals(tokens, "VALUES", TokenType.KEYWORD)) {
             throw new IllegalArgumentException("Wrong format for INSERT statement");
         }
         tokens.removeFirst();
         List<String> values = new ArrayList<>();
-        parseInsertData(tokens, values);
+        parseInsertData(tokens, values, true);
         if (columns.size() != values.size()) {
             throw new IllegalArgumentException(
                     "Number of line to insert doesn't match with numbers with given columns"
@@ -240,29 +240,47 @@ public class SQLParser {
         }
     }
 
-    private void parseInsertData(List<Token> tokens, List<String> columns) {
+    private void parseInsertData(List<Token> tokens, List<String> data, boolean isValues) {
         if (!tokenEquals(tokens, "(", TokenType.SYMBOL)){
             throw new IllegalArgumentException("Parenthesis were expected");
         }
         tokens.removeFirst();
-        parseInsertLine(tokens, columns);
+        if (!isValues) {
+            parseColumnsInsertTo(tokens, data);
+        } else {
+            parseValuesToInsert(tokens, data);
+        }
         if (!tokenEquals(tokens, ")", TokenType.SYMBOL)){
             throw new IllegalArgumentException("Parenthesis were not closed");
         }
         tokens.removeFirst();
     }
 
-    private void parseInsertLine(List<Token> tokens, List<String> columns) {
+    private void parseColumnsInsertTo(List<Token> tokens, List<String> columns) {
         if (tokenEqualsByType(tokens, TokenType.IDENTIFIER)) {
             columns.add(tokens.removeFirst().value());
             if (tokenEquals(tokens, ",", TokenType.SYMBOL)) {
                 tokens.removeFirst();
-                parseInsertLine(tokens, columns);
+                parseColumnsInsertTo(tokens, columns);
             }
         } else {
-            throw new IllegalArgumentException("Field name was not found");
+            throw new IllegalArgumentException("Column name was not found");
         }
     }
+
+    private void parseValuesToInsert(List<Token> tokens, List<String> values) {
+        if (isValidValue(tokens)) {
+            values.add(tokens.removeFirst().value());
+            if (tokenEquals(tokens, ",", TokenType.SYMBOL)) {
+                tokens.removeFirst();
+                parseValuesToInsert(tokens, values);
+            }
+        } else {
+            throw new IllegalArgumentException("Value was not found");
+        }
+    }
+
+
 
     private boolean tokenEquals(List<Token> tokens, String value, TokenType type) {
         return !tokens.isEmpty() &&
@@ -285,6 +303,11 @@ public class SQLParser {
         return !tokens.isEmpty() &&
                 tokens.getFirst().type() == TokenType.IDENTIFIER &&
                 Constants.JSQL_TYPES.contains(tokens.getFirst().value().toUpperCase());
+    }
+
+    private boolean isValidValue(List<Token> tokens) {
+        return tokenEqualsByType(tokens, TokenType.TEXT) ||
+               tokenEqualsByType(tokens, TokenType.NUMBER);
     }
 
 }

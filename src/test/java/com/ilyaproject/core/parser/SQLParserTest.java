@@ -321,11 +321,11 @@ class SQLParserTest {
                 new Token(TokenType.SYMBOL, ")"),
                 new Token(TokenType.KEYWORD, "VALUES"),
                 new Token(TokenType.SYMBOL, "("),
-                new Token(TokenType.IDENTIFIER, "USA"),
+                new Token(TokenType.TEXT, "USA"),
                 new Token(TokenType.SYMBOL, ","),
-                new Token(TokenType.IDENTIFIER, "9867000"),
+                new Token(TokenType.NUMBER, "9867000"),
                 new Token(TokenType.SYMBOL, ","),
-                new Token(TokenType.IDENTIFIER, "348000000"),
+                new Token(TokenType.NUMBER, "348000000"),
                 new Token(TokenType.SYMBOL, ")")
         ));
         HashMap<String, String> rowsValues = new HashMap<>(
@@ -361,13 +361,13 @@ class SQLParserTest {
                 new Token(TokenType.SYMBOL, ")"),
                 new Token(TokenType.KEYWORD, "VALUES"),
                 new Token(TokenType.SYMBOL, "("),
-                new Token(TokenType.IDENTIFIER, "something"),
+                new Token(TokenType.TEXT, "something"),
                 new Token(TokenType.SYMBOL, ","),
-                new Token(TokenType.IDENTIFIER, "USA"),
+                new Token(TokenType.TEXT, "USA"),
                 new Token(TokenType.SYMBOL, ","),
-                new Token(TokenType.IDENTIFIER, "9867000"),
+                new Token(TokenType.NUMBER, "9867000"),
                 new Token(TokenType.SYMBOL, ","),
-                new Token(TokenType.IDENTIFIER, "348000000"),
+                new Token(TokenType.NUMBER, "348000000"),
                 new Token(TokenType.SYMBOL, ")")
         ));
 
@@ -400,11 +400,11 @@ class SQLParserTest {
                 new Token(TokenType.SYMBOL, ")"),
                 new Token(TokenType.KEYWORD, "VALUES"),
                 new Token(TokenType.SYMBOL, "("),
-                new Token(TokenType.IDENTIFIER, "USA"),
+                new Token(TokenType.TEXT, "USA"),
                 new Token(TokenType.SYMBOL, ","),
-                new Token(TokenType.IDENTIFIER, "9867000"),
+                new Token(TokenType.NUMBER, "9867000"),
                 new Token(TokenType.SYMBOL, ","),
-                new Token(TokenType.IDENTIFIER, "348000000"),
+                new Token(TokenType.NUMBER, "348000000"),
                 new Token(TokenType.SYMBOL, ")")
         ));
 
@@ -436,11 +436,11 @@ class SQLParserTest {
                 new Token(TokenType.SYMBOL, ")"),
                 new Token(TokenType.KEYWORD, "VALUES"),
                 new Token(TokenType.SYMBOL, "("),
-                new Token(TokenType.IDENTIFIER, "USA"),
+                new Token(TokenType.TEXT, "USA"),
                 new Token(TokenType.SYMBOL, ","),
-                new Token(TokenType.IDENTIFIER, "9867000"),
+                new Token(TokenType.NUMBER, "9867000"),
                 new Token(TokenType.SYMBOL, ","),
-                new Token(TokenType.IDENTIFIER, "348000000"),
+                new Token(TokenType.NUMBER, "348000000"),
                 new Token(TokenType.SYMBOL, ")")
         ));
 
@@ -472,11 +472,11 @@ class SQLParserTest {
                 new Token(TokenType.IDENTIFIER, "population"),
                 new Token(TokenType.SYMBOL, ")"),
                 new Token(TokenType.SYMBOL, "("),
-                new Token(TokenType.IDENTIFIER, "USA"),
+                new Token(TokenType.TEXT, "USA"),
                 new Token(TokenType.SYMBOL, ","),
-                new Token(TokenType.IDENTIFIER, "9867000"),
+                new Token(TokenType.NUMBER, "9867000"),
                 new Token(TokenType.SYMBOL, ","),
-                new Token(TokenType.IDENTIFIER, "348000000"),
+                new Token(TokenType.NUMBER, "348000000"),
                 new Token(TokenType.SYMBOL, ")")
         ));
 
@@ -508,11 +508,11 @@ class SQLParserTest {
                 new Token(TokenType.SYMBOL, ")"),
                 new Token(TokenType.KEYWORD, "VALUES"),
                 new Token(TokenType.SYMBOL, "("),
-                new Token(TokenType.IDENTIFIER, "USA"),
+                new Token(TokenType.TEXT, "USA"),
                 new Token(TokenType.SYMBOL, ","),
-                new Token(TokenType.IDENTIFIER, "9867000"),
+                new Token(TokenType.NUMBER, "9867000"),
                 new Token(TokenType.SYMBOL, ","),
-                new Token(TokenType.IDENTIFIER, "348000000"),
+                new Token(TokenType.NUMBER, "348000000"),
                 new Token(TokenType.SYMBOL, ")")
         ));
 
@@ -544,11 +544,11 @@ class SQLParserTest {
                 new Token(TokenType.IDENTIFIER, "population"),
                 new Token(TokenType.KEYWORD, "VALUES"),
                 new Token(TokenType.SYMBOL, "("),
-                new Token(TokenType.IDENTIFIER, "USA"),
+                new Token(TokenType.TEXT, "USA"),
                 new Token(TokenType.SYMBOL, ","),
-                new Token(TokenType.IDENTIFIER, "9867000"),
+                new Token(TokenType.NUMBER, "9867000"),
                 new Token(TokenType.SYMBOL, ","),
-                new Token(TokenType.IDENTIFIER, "348000000"),
+                new Token(TokenType.NUMBER, "348000000"),
                 new Token(TokenType.SYMBOL, ")")
         ));
 
@@ -580,11 +580,11 @@ class SQLParserTest {
                 new Token(TokenType.SYMBOL, ")"),
                 new Token(TokenType.KEYWORD, "VALUES"),
                 new Token(TokenType.SYMBOL, "("),
-                new Token(TokenType.IDENTIFIER, "USA"),
+                new Token(TokenType.TEXT, "USA"),
                 new Token(TokenType.SYMBOL, ","),
-                new Token(TokenType.IDENTIFIER, "9867000"),
+                new Token(TokenType.NUMBER, "9867000"),
                 new Token(TokenType.SYMBOL, ","),
-                new Token(TokenType.IDENTIFIER, "348000000"),
+                new Token(TokenType.NUMBER, "348000000"),
                 new Token(TokenType.SYMBOL, ")")
         ));
 
@@ -596,7 +596,7 @@ class SQLParserTest {
 
         // Then
         assertEquals(
-                "Failed to parse INSERT statement Field name was not found",
+                "Failed to parse INSERT statement Column name was not found",
                 e.getMessage()
         );
     }
