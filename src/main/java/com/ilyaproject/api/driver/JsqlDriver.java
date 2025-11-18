@@ -30,6 +30,13 @@ public class JsqlDriver {
         db = Database.getInstance();
     }
 
+    JsqlDriver(Database db) {
+        tokenizer = new SQLTokenizer();
+        parser = new SQLParser();
+        executor = new SQLExecutor();
+        this.db = db;
+    }
+
     public SQLResponse run(String sqlStatement) {
         SQLResponse response;
         try {

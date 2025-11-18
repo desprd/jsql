@@ -1,8 +1,10 @@
 package com.ilyaproject.api.driver;
 
+import com.ilyaproject.core.db.Database;
 import com.ilyaproject.core.db.TableUtils;
 import com.ilyaproject.core.db.type.JsqlType;
 import com.ilyaproject.core.dto.executor.SQLResponse;
+import com.ilyaproject.core.dto.query.CreateTableQuery;
 import com.ilyaproject.core.dto.table.TableDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +30,7 @@ public class JsqlDriverTest {
     }
 
     @Test
-    void createTableStatement_runJsqlDriver_returnSQLResponse() {
+    void createTableStatement_runJsqlDriver_returnSuccessfulSQLResponse() {
         // Given
         sqlStatement = "CREATE TABLE products(country_name TEXT, area BIGINT, population BIGINT)";
 
@@ -87,4 +89,25 @@ public class JsqlDriverTest {
         assertTrue(response.data().isPresent());
         assertEquals(expectedTables, response.data().get());
     }
+
+    @Test
+    void insertIntoStatement_runJsqlDriver_returnSuccessfulSQLResponse() {
+        // Given
+        Database db = Database.getInstance();
+        Map<String, JsqlType> schema = new HashMap<>();
+        schema.put("first_field", JsqlType.TEXT);
+        schema.put("second_field", JsqlType.TEXT);
+        CreateTableQuery query = new CreateTableQuery("tables", schema);
+        sqlStatement = "INSERT INTO tables (first_field, second_field) VALUES ('something_1', 'something_2')";
+
+        // When
+        TableUtils.createTable(query, db);
+        SQLResponse response = driver.run(sqlStatement);
+
+        // Then
+        assertTrue(response.success());
+        assertEquals("Row inserted", response.responseMessage());
+        assertTrue(response.data().isEmpty());
+    }
+
 }

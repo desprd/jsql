@@ -21,7 +21,7 @@ public class InsertIntoExecutor implements StatementExecutor<InsertIntoQuery>{
         } catch (Exception e) {
             return new SQLResponse(
                     false,
-                    "Failed to create table " + e.getMessage(),
+                    "Failed to insert row " + e.getMessage(),
                     Optional.empty()
             );
         }
