@@ -6,6 +6,7 @@ import com.ilyaproject.core.db.type.JsqlType;
 import com.ilyaproject.core.dto.executor.SQLResponse;
 import com.ilyaproject.core.dto.query.CreateTableQuery;
 import com.ilyaproject.core.dto.table.TableDto;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -23,10 +24,12 @@ import static org.mockito.Mockito.mockStatic;
 public class JsqlDriverTest {
     private JsqlDriver driver;
     private String sqlStatement;
+    private Database db;
 
     @BeforeEach
     void setUp() {
         driver = new JsqlDriver();
+        db = Database.getInstance();
     }
 
     @Test
@@ -93,7 +96,6 @@ public class JsqlDriverTest {
     @Test
     void insertIntoStatement_runJsqlDriver_returnSuccessfulSQLResponse() {
         // Given
-        Database db = Database.getInstance();
         Map<String, JsqlType> schema = new HashMap<>();
         schema.put("first_field", JsqlType.TEXT);
         schema.put("second_field", JsqlType.TEXT);
@@ -108,6 +110,30 @@ public class JsqlDriverTest {
         assertTrue(response.success());
         assertEquals("Row inserted", response.responseMessage());
         assertTrue(response.data().isEmpty());
+    }
+
+    @Test
+    void dropTableStatement_runJsqlDriver_returnSuccessfulSQLResponse() {
+        // Given
+        Map<String, JsqlType> schema = new HashMap<>();
+        schema.put("first_field", JsqlType.TEXT);
+        schema.put("second_field", JsqlType.TEXT);
+        CreateTableQuery query = new CreateTableQuery("tables", schema);
+        sqlStatement = "DROP TABLE tables";
+
+        // When
+        TableUtils.createTable(query, db);
+        SQLResponse response = driver.run(sqlStatement);
+
+        // Then
+        assertTrue(response.success());
+        assertEquals("Table dropped", response.responseMessage());
+        assertTrue(response.data().isEmpty());
+    }
+
+    @AfterEach
+    void cleanUp() {
+        Database.removeInstance();
     }
 
 }

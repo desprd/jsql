@@ -72,6 +72,11 @@ public class TableUtils {
         }
     }
 
+    public static boolean tableExists(String tableName, Database db) {
+        Map<String, Table> allTables = db.getTables();
+        return allTables.containsKey(tableName);
+    }
+
     private static Object parseToCorrectObject(String value, JsqlType type) {
         try {
             return switch (type) {

@@ -5,10 +5,7 @@ import com.ilyaproject.core.dto.expression.ExpressionNode;
 import com.ilyaproject.core.dto.expression.ExpressionUnit;
 import com.ilyaproject.core.dto.expression.ExpressionUnitType;
 import com.ilyaproject.core.dto.expression.SimpleExpression;
-import com.ilyaproject.core.dto.query.CreateTableQuery;
-import com.ilyaproject.core.dto.query.InsertIntoQuery;
-import com.ilyaproject.core.dto.query.SQLQuery;
-import com.ilyaproject.core.dto.query.SelectQuery;
+import com.ilyaproject.core.dto.query.*;
 import com.ilyaproject.core.dto.token.Token;
 import com.ilyaproject.core.dto.token.TokenType;
 import org.junit.jupiter.api.BeforeEach;
@@ -597,6 +594,66 @@ class SQLParserTest {
         // Then
         assertEquals(
                 "Failed to parse INSERT statement Column name was not found",
+                e.getMessage()
+        );
+    }
+
+    @Test
+    void getFullDropTableStatement_parsing_returnDropTableQuery() {
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "DROP"),
+                new Token(TokenType.KEYWORD, "TABLE"),
+                new Token(TokenType.IDENTIFIER, "countries")
+        ));
+        DropTableQuery expectedQuery = new DropTableQuery("countries");
+
+        // When
+        SQLQuery resultQuery = parser.parseStatement(tokens);
+
+        //Then
+        assertInstanceOf(DropTableQuery.class, resultQuery);
+        assertEquals(expectedQuery, resultQuery);
+    }
+
+    @Test
+    void getDropTableStatementWithoutTABLEKeyword_parsing_throwIllegalArgumentException() {
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "DROP"),
+                new Token(TokenType.IDENTIFIER, "countries")
+        ));
+
+        // When
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> parser.parseStatement(tokens)
+        );
+
+        // Then
+        assertEquals(
+                "Failed to parse DROP statement Wrong format for DROP statement",
+                e.getMessage()
+        );
+    }
+
+    @Test
+    void getDropTableStatementWithoutTableName_parsing_throwIllegalArgumentException() {
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "DROP"),
+                new Token(TokenType.KEYWORD, "TABLE")
+        ));
+
+        // When
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> parser.parseStatement(tokens)
+        );
+
+        // Then
+        assertEquals(
+                "Failed to parse DROP statement Table name was not found",
                 e.getMessage()
         );
     }
