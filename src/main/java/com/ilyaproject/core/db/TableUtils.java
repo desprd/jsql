@@ -65,6 +65,13 @@ public class TableUtils {
         db.insert(query.tableName(), dataToInsert);
     }
 
+    public static void removeTableByName(String tableName, Database db) {
+        Table table = db.removeTableByName(tableName);
+        if (table == null) {
+            throw new IllegalArgumentException("Database doesn't contain table " + tableName);
+        }
+    }
+
     private static Object parseToCorrectObject(String value, JsqlType type) {
         try {
             return switch (type) {

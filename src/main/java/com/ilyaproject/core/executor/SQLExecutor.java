@@ -1,10 +1,7 @@
 package com.ilyaproject.core.executor;
 
 import com.ilyaproject.core.dto.executor.SQLResponse;
-import com.ilyaproject.core.dto.query.CreateTableQuery;
-import com.ilyaproject.core.dto.query.InsertIntoQuery;
-import com.ilyaproject.core.dto.query.SQLQuery;
-import com.ilyaproject.core.dto.query.SelectQuery;
+import com.ilyaproject.core.dto.query.*;
 import com.ilyaproject.core.db.Database;
 
 import java.sql.SQLException;
@@ -18,7 +15,9 @@ public class SQLExecutor {
         CreateTableQuery.class,
         new CreateTableExecutor(),
         InsertIntoQuery.class,
-        new InsertIntoExecutor()
+        new InsertIntoExecutor(),
+        DropTableQuery.class,
+        new DropTableExecutor()
     );
 
     @SuppressWarnings("unchecked")

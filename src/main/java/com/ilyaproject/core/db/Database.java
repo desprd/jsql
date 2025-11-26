@@ -69,4 +69,12 @@ public final class Database {
         return Optional.empty();
     }
 
+    Table removeTableByName(String name) {
+        Optional<Table> tableToRemove = getTableByName(name);
+        if (tableToRemove.isPresent()) {
+            return tables.remove(name);
+        }
+        return null;
+    }
+
 }

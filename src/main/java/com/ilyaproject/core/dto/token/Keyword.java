@@ -12,5 +12,6 @@ public enum Keyword {
     BY,
     VALUES,
     AND,
-    OR
+    OR,
+    DROP
 }

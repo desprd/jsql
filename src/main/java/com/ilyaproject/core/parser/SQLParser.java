@@ -36,7 +36,11 @@ public class SQLParser {
             }
         }
         else if (firstToken.value().equals("DROP") && firstToken.type() == TokenType.KEYWORD) {
-            parseDrop(tokens);
+            try {
+                query = parseDrop(tokens);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Failed to parse DROP statement " + e.getMessage());
+            }
         }
         else {
             throw new IllegalArgumentException("Unexpected statement starts with " + firstToken.value());
@@ -105,8 +109,16 @@ public class SQLParser {
         return createTableBuilder.build();
     }
 
-    private void parseDrop(List<Token> tokens) {
-        // TODO
+    private DropTableQuery parseDrop(List<Token> tokens) {
+        if (!tokenEquals(tokens, "TABLE", TokenType.KEYWORD)) {
+            throw new IllegalArgumentException("Wrong format for DROP statement");
+        }
+        tokens.removeFirst();
+        if (tokenEqualsByType(tokens, TokenType.IDENTIFIER)) {
+            return new DropTableQuery(tokens.removeFirst().value());
+        } else {
+            throw new IllegalArgumentException("Table name was not found");
+        }
     }
 
     private void parseColumnList(List<Token> tokens, SelectQueryBuilder queryBuilder) {
