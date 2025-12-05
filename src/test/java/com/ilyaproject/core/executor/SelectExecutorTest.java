@@ -29,6 +29,7 @@ class SelectExecutorTest {
     private TableDto productsTable;
     private SimpleExpression leftExpr;
     private SimpleExpression rightExpr;
+    private Integer limit;
 
     @BeforeEach
     void setUp() {
@@ -68,6 +69,9 @@ class SelectExecutorTest {
         );
 
         productsTable = new TableDto(new HashMap<>(schema), new ArrayList<>(rows));
+
+        limit = 3;
+
     }
 
     @Test
@@ -110,6 +114,35 @@ class SelectExecutorTest {
                 new HashMap<>(Map.of("name", "Smartwatch", "price", 900.0)),
                 new HashMap<>(Map.of("name", "Camera", "price", 1800.0)),
                 new HashMap<>(Map.of("name", "Monitor", "price", 400.0))
+        );
+        List<TableDto> expectedTable = List.of(new TableDto(Map.of("name", JsqlType.TEXT, "price", JsqlType.INTEGER), expectedRows));
+
+        // When
+        SQLResponse response;
+        try (MockedStatic<TableUtils> utilities = mockStatic(TableUtils.class)) {
+            utilities.when(() -> TableUtils.getTablesByTablesNames(any(), any())).thenReturn(List.of(productsTable));
+            response = executor.get(query, Database.getInstance());
+        }
+
+        // Then
+        assertTrue(response.success());
+        assertTrue(response.data().isPresent());
+        assertEquals(expectedTable, response.data().get());
+    }
+
+    @Test
+    void selectQueryChosenColumnsAndNoConditionsWithLimit_executeSelect_returnSuccessfulSQLResponse() {
+        // Given
+        query = new SelectQueryBuilder()
+                .addTable("products")
+                .addColumn("name")
+                .addColumn("price")
+                .addLimit(limit)
+                .build();
+        List<Map<String, Object>> expectedRows = List.of(
+                new HashMap<>(Map.of("name", "TV", "price", 1200.0)),
+                new HashMap<>(Map.of("name", "Laptop", "price", 1500.0)),
+                new HashMap<>(Map.of("name", "Phone", "price", 800.0))
         );
         List<TableDto> expectedTable = List.of(new TableDto(Map.of("name", JsqlType.TEXT, "price", JsqlType.INTEGER), expectedRows));
 
@@ -226,6 +259,37 @@ class SelectExecutorTest {
     }
 
     @Test
+    void selectQueryWithOrConditionWithLimit_executeSelect_returnSuccessfulSQLResponse() {
+        // Given
+        ExpressionNode andNode = new ExpressionNode("OR", leftExpr, rightExpr);
+        query = new SelectQueryBuilder()
+                .addTable("products")
+                .addColumn("name")
+                .addColumn("price")
+                .addConditions(andNode)
+                .addLimit(limit)
+                .build();
+        List<Map<String, Object>> expectedRows = List.of(
+                new HashMap<>(Map.of("name", "TV", "price", 1200.0)),
+                new HashMap<>(Map.of("name", "Laptop", "price", 1500.0)),
+                new HashMap<>(Map.of("name", "Phone", "price", 800.0))
+        );
+        List<TableDto> expectedTable = List.of(new TableDto(Map.of("name", JsqlType.TEXT, "price", JsqlType.INTEGER), expectedRows));
+
+        // When
+        SQLResponse response;
+        try (MockedStatic<TableUtils> utilities = mockStatic(TableUtils.class)) {
+            utilities.when(() -> TableUtils.getTablesByTablesNames(any(), any())).thenReturn(List.of(productsTable));
+            response = executor.get(query, Database.getInstance());
+        }
+
+        // Then
+        assertTrue(response.success());
+        assertTrue(response.data().isPresent());
+        assertEquals(expectedTable, response.data().get());
+    }
+
+    @Test
     void selectQueryWithWrongFormatSimpleCondition_executeSelect_returnFailedSQLResponse() {
         // Given
         List<ExpressionUnit> units = List.of(
@@ -312,15 +376,3 @@ class SelectExecutorTest {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-

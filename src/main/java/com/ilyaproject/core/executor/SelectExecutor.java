@@ -20,6 +20,7 @@ class SelectExecutor implements StatementExecutor<SelectQuery> {
             List<TableDto> tables = TableUtils.getTablesByTablesNames(query.tables(), db);
             tables = applyConditions(tables, query.conditions());
             extractRequiredColumns(tables, query.columns());
+            tables = applyLimit(tables, query.limit());
             return new SQLResponse(
                     true,
                     "Selected",
@@ -31,6 +32,21 @@ class SelectExecutor implements StatementExecutor<SelectQuery> {
                     "Failed to select: " + e.getMessage(),
                     Optional.empty());
         }
+    }
+
+    private List<TableDto> applyLimit(List<TableDto> tables, Integer limit) {
+        if (limit == null) return tables;
+
+        return tables.stream()
+                .map(table -> {
+                    List<Map<String, Object>> limited = table.rows()
+                            .stream()
+                            .limit(limit)
+                            .map(row -> (Map<String, Object>) new HashMap<>(row))
+                            .toList();
+                    return new TableDto(new HashMap<>(table.schema()), limited);
+                })
+                .toList();
     }
 
     private void extractRequiredColumns(List<TableDto> tables, List<String> columns) {

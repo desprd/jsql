@@ -7,7 +7,8 @@ import java.util.List;
 public record SelectQuery(
         List<String> tables,
         List<String> columns,
-        Expression conditions
+        Expression conditions,
+        Integer limit
 ) implements SQLQuery {
     public SelectQuery {
         tables = tables == null ? new ArrayList<>() : new ArrayList<>(tables);

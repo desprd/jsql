@@ -13,5 +13,6 @@ public enum Keyword {
     VALUES,
     AND,
     OR,
-    DROP
+    DROP,
+    LIMIT
 }

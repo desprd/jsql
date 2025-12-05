@@ -50,7 +50,7 @@ class SQLParserTest {
     }
 
     @Test
-    void getLisOfSelectTokensWithWhereSimpleExpression_parsing_returnSelectQuery() {
+    void getLisOfSelectTokensWithWhereSimpleExpressionAndLimit_parsing_returnSelectQuery() {
         // Given
         List<Token> tokens = new ArrayList<>(List.of(
                 new Token(TokenType.KEYWORD, "SELECT"),
@@ -62,7 +62,10 @@ class SQLParserTest {
                 new Token(TokenType.KEYWORD, "WHERE"),
                 new Token(TokenType.IDENTIFIER, "region_id"),
                 new Token(TokenType.SYMBOL, "="),
-                new Token(TokenType.NUMBER, "1")
+                new Token(TokenType.NUMBER, "1"),
+                new Token(TokenType.KEYWORD, "LIMIT"),
+                new Token(TokenType.NUMBER, "3")
+
 
         ));
         List<String> expectedTableList = new ArrayList<>(List.of(
@@ -78,6 +81,7 @@ class SQLParserTest {
                 new ExpressionUnit("1", ExpressionUnitType.NUMERIC)
         ));
         SimpleExpression expectedExpression = new SimpleExpression(units);
+        Integer expectedLimit = 3;
 
         // When
         SQLQuery query = parser.parseStatement(tokens);
@@ -88,6 +92,7 @@ class SQLParserTest {
         assertEquals(expectedTableList, selectQuery.tables());
         assertEquals(expectedColumns, selectQuery.columns());
         assertEquals(expectedExpression, selectQuery.conditions());
+        assertEquals(expectedLimit, selectQuery.limit());
     }
 
     @Test
@@ -164,6 +169,28 @@ class SQLParserTest {
         );
         assertEquals(
                 "Failed to parse SELECT statement Statement with unclosed parentheses",
+                e.getMessage()
+        );
+    }
+
+    @Test
+    void getListOfSelectTokensAllColumnsNoExpressionWithLimitNoValue_parsing_throwIllegalArgumentException() {
+        // Given
+        List<Token> tokens = new ArrayList<>(List.of(
+                new Token(TokenType.KEYWORD, "SELECT"),
+                new Token(TokenType.SYMBOL, "*"),
+                new Token(TokenType.KEYWORD, "FROM"),
+                new Token(TokenType.IDENTIFIER, "countries"),
+                new Token(TokenType.KEYWORD, "LIMIT")
+        ));
+
+        // When / Then
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> parser.parseStatement(tokens)
+        );
+        assertEquals(
+                "Failed to parse SELECT statement LIMIT statement value was not found",
                 e.getMessage()
         );
     }

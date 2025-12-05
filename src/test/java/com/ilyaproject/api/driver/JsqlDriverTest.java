@@ -49,7 +49,7 @@ public class JsqlDriverTest {
     @Test
     void selectFromStatement_runJsqlDriver_returnSuccessfulSQLResponse() {
         // Given
-        sqlStatement = "SELECT * FROM products WHERE price > 1000";
+        sqlStatement = "SELECT * FROM products WHERE price > 1000 LIMIT 2";
         Map<String, JsqlType> schema = Map.of(
                 "id", JsqlType.BIGINT,
                 "name", JsqlType.TEXT,
@@ -72,9 +72,7 @@ public class JsqlDriverTest {
         );
         List<Map<String, Object>> expectedRows = List.of(
                 new HashMap<>(Map.of("id", 1, "name", "TV", "price", 1200.0, "category", "Electronics", "stock", 5)),
-                new HashMap<>(Map.of("id", 2, "name", "Laptop", "price", 1500.0, "category", "Computers", "stock", 3)),
-                new HashMap<>(Map.of("id", 9, "name", "Camera", "price", 1800.0, "category", "Photography", "stock", 5))
-
+                new HashMap<>(Map.of("id", 2, "name", "Laptop", "price", 1500.0, "category", "Computers", "stock", 3))
         );
         List<TableDto> expectedTables = List.of(new TableDto(schema, expectedRows));
         var productsTable = new TableDto(new HashMap<>(schema), new ArrayList<>(rows));
@@ -92,6 +90,8 @@ public class JsqlDriverTest {
         assertTrue(response.data().isPresent());
         assertEquals(expectedTables, response.data().get());
     }
+
+
 
     @Test
     void insertIntoStatement_runJsqlDriver_returnSuccessfulSQLResponse() {

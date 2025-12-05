@@ -9,6 +9,7 @@ public class SelectQueryBuilder {
     private final List<String> tables = new ArrayList<>();
     private final List<String> columns = new ArrayList<>();
     private Expression conditions;
+    private Integer limit = null;
 
     public SelectQueryBuilder addTable(String table) {
         tables.add(table);
@@ -25,8 +26,13 @@ public class SelectQueryBuilder {
         return this;
     }
 
+    public SelectQueryBuilder addLimit(Integer limit) {
+        this.limit = limit;
+        return this;
+    }
+
     public SelectQuery build() {
-        return new SelectQuery(tables, columns, conditions);
+        return new SelectQuery(tables, columns, conditions, limit);
     }
 
 }

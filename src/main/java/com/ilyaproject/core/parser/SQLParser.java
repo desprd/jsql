@@ -61,6 +61,10 @@ public class SQLParser {
             tokens.removeFirst();
             parseWhereClause(tokens, queryBuilder);
         }
+        if (tokenEquals(tokens, "LIMIT", TokenType.KEYWORD)) {
+            tokens.removeFirst();
+            parseLimitClause(tokens, queryBuilder);
+        }
         return queryBuilder.build();
     }
 
@@ -163,6 +167,19 @@ public class SQLParser {
     private void parseWhereClause(List<Token> tokens, SelectQueryBuilder queryBuilder){
         Expression expression = parseExpression(tokens);
         queryBuilder.addConditions(expression);
+    }
+
+    private void parseLimitClause(List<Token> tokens, SelectQueryBuilder queryBuilder) {
+        if (tokenEqualsByType(tokens, TokenType.NUMBER)) {
+            try {
+                Integer limit = Integer.parseInt(tokens.removeFirst().value());
+                queryBuilder.addLimit(limit);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Failed to process LIMIT value");
+            }
+        } else {
+            throw new IllegalArgumentException("LIMIT statement value was not found");
+        }
     }
 
     private Expression parseExpression(List<Token> tokens){
